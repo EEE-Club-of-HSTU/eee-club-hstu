@@ -9,6 +9,7 @@
       ['History', 'history.html', 'From one lab bench to six wings'],
       ['Leadership', 'leadership.html', 'Executive, alumni and taskforce'],
       ['Advisory panel', 'advisory.html', 'The teachers who guide the club'],
+      ['Alumni association', 'alumni.html', 'Graduates, stay plugged in'],
       ['Constitution', 'constitution.html', 'The rules of our circuit']
     ] },
     { label: 'Events', key: 'events', items: [
@@ -23,10 +24,7 @@
       ['Resources', 'resources.html', 'Notes, datasheets and code'],
       ['Gallery', 'gallery.html', 'Moments in high voltage']
     ] },
-    { label: 'Verify', key: 'verify', items: [
-      ['Certificate', 'verify.html', 'Check a certificate ID'],
-      ['Membership', 'verify.html#membership', 'Confirm an active member']
-    ] },
+    { label: 'Verify', href: 'verify.html', key: 'verify' },
     { label: 'Contact', key: 'contact', items: [
       ['Contact us', 'contact.html', 'Send us a message'],
       ['Location', 'contact.html#map', 'Find the EEE building'],
@@ -62,14 +60,14 @@
 
     return '<header class="site wrap">' + LOGO +
       '<nav class="nav" aria-label="Main">' + desk + '</nav>' +
-      '<div style="display:flex;align-items:center;gap:10px"><a class="btn sm' + (section === 'join' ? ' dark' : '') + '" href="join.html">Join us</a>' +
+      '<div style="display:flex;align-items:center;gap:10px"><a class="btn sm" href="alumni.html">Alumni</a>' +
       '<button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3F2EE" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 9h16M4 15h10"/></svg></button></div>' +
       '</header>' +
       '<div class="mnav" id="mnav" role="dialog" aria-modal="true" aria-label="Menu"><div class="wrap">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 0">' + LOGO +
       '<button class="menu-close" type="button" aria-label="Close menu" style="width:48px;height:48px;border-radius:999px;border:0;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#08090B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
       '<nav aria-label="Mobile">' + mob + '</nav>' +
-      '<div style="margin-top:32px"><a class="btn" href="join.html">Join the club</a></div></div></div>';
+      '<div style="margin-top:32px"><a class="btn" href="alumni.html">Alumni association</a></div></div></div>';
   }
 
   function col(title, links) {
@@ -89,10 +87,10 @@
       '<button type="submit" aria-label="Subscribe" style="width:48px;height:48px;border:0;border-radius:999px;background:#D7FF3D;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#08090B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></button></div>' +
       '<p class="pulse-msg m" role="status" style="margin:12px 0 0;color:#D7FF3D;min-height:16px"></p></form>' +
       '<div style="flex:1 1 560px;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:32px">' +
-      col('About', [['Our story', 'about.html'], ['History', 'history.html'], ['Leadership', 'leadership.html'], ['Advisory panel', 'advisory.html'], ['Constitution', 'constitution.html']]) +
+      col('About', [['Our story', 'about.html'], ['History', 'history.html'], ['Leadership', 'leadership.html'], ['Advisory panel', 'advisory.html'], ['Alumni association', 'alumni.html'], ['Constitution', 'constitution.html']]) +
       col('Events', [['Upcoming', 'events.html'], ['Volt Rush 2026', 'event.html'], ['Archive', 'archive.html'], ['Notices', 'notices.html']]) +
       col('Content', [['Blog', 'blog.html'], ['Pulse magazine', 'magazine.html'], ['Resources', 'resources.html'], ['Gallery', 'gallery.html']]) +
-      col('Club', [['Join', 'join.html'], ['Verify', 'verify.html'], ['Contact', 'contact.html'], ['Sitemap', 'sitemap.html']]) +
+      col('Club', [['Alumni association', 'alumni.html'], ['Verify a certificate', 'verify.html'], ['Contact', 'contact.html'], ['Sitemap', 'sitemap.html']]) +
       '</div></div>' +
       '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;margin-top:72px;padding-top:24px;border-top:1px solid #262A31">' +
       '<div class="m" style="display:flex;flex-wrap:wrap;gap:24px"><a href="https://facebook.com">Facebook ↗</a><a href="https://instagram.com">Instagram ↗</a><a href="https://linkedin.com">LinkedIn ↗</a><a href="https://youtube.com">YouTube ↗</a></div>' +
@@ -136,13 +134,37 @@
     mnav.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
   }
 
-  // newsletter (demo)
+  // newsletter
   document.querySelectorAll('.pulse-form').forEach(function (form) {
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      var input = form.querySelector('input'), msg = form.querySelector('.pulse-msg');
-      msg.textContent = /.+@.+\..+/.test(input.value) ? 'You’re subscribed. See you in the next Pulse.' : 'Enter a valid email address.';
-      msg.style.color = /.+@.+\..+/.test(input.value) ? '#D7FF3D' : '#FF5A1F';
+      var input = form.querySelector('input');
+      var msg = form.querySelector('.pulse-msg');
+      var btn = form.querySelector('button[type="submit"]');
+      var email = input.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 200) {
+        msg.textContent = 'Enter a valid email address.';
+        msg.style.color = '#FF5A1F';
+        return;
+      }
+      if (btn) btn.disabled = true;
+      msg.textContent = 'Subscribing…';
+      msg.style.color = '#8A8F98';
+      try {
+        var db = window.EEEDB;
+        var res = db && typeof db.subscribe === 'function' ? await db.subscribe(email) : { demo: true };
+        var isDemo = !db || !db.configured || Boolean(res && res.demo);
+        msg.textContent = isDemo
+          ? 'You’re subscribed. See you in the next Pulse. (demo — not saved)'
+          : 'You’re subscribed. See you in the next Pulse.';
+        msg.style.color = '#D7FF3D';
+        form.reset();
+      } catch (err) {
+        msg.textContent = 'Could not subscribe right now. Please try again.';
+        msg.style.color = '#FF5A1F';
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     });
   });
 
@@ -187,8 +209,9 @@
 
   // countdown: <div data-countdown="2026-11-14T10:00:00+06:00"> with [data-unit=d|h|m|s]
   document.querySelectorAll('[data-countdown]').forEach(function (el) {
-    var target = new Date(el.getAttribute('data-countdown')).getTime();
     function tick() {
+      var target = new Date(el.getAttribute('data-countdown')).getTime();
+      if (isNaN(target)) return;
       var d = Math.max(0, target - Date.now());
       var parts = { d: Math.floor(d / 864e5), h: Math.floor(d / 36e5) % 24, m: Math.floor(d / 6e4) % 60, s: Math.floor(d / 1e3) % 60 };
       el.querySelectorAll('[data-unit]').forEach(function (u) { u.textContent = String(parts[u.getAttribute('data-unit')]).padStart(2, '0'); });

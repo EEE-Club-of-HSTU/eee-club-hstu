@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alumni Association — EEE Club of HSTU</title>
+<meta name="description" content="Register with the EEE Alumni Association of HSTU — mentor students, open doors to internships and reconnect with your batch.">
+<meta name="theme-color" content="#08090B">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.al-steps{border-top:1px solid #262A31}
+.al-step{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:34px 0;border-bottom:1px solid #262A31;align-items:baseline}
+.al-step h3{margin:0;font-size:28px;font-weight:500;letter-spacing:-.02em}
+.al-step p{margin:8px 0 0;max-width:560px;font-size:17px;line-height:1.6;color:#8A8F98}
+.al-reg-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.75fr);gap:48px;align-items:start}
+.al-rail{position:sticky;top:32px;display:flex;flex-direction:column;gap:24px}
+.al-form-sec{display:flex;flex-direction:column;gap:18px;padding-top:22px;border-top:1px solid #262A31}
+.al-form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:16px}
+.req{color:#D7FF3D;margin-left:3px}
+.hint{font-size:13px;line-height:1.45;color:#8A8F98}
+.err-msg{display:none;align-items:center;gap:6px;font-size:13px;line-height:1.4;color:#FF5A1F}
+.field :is(:user-invalid,.user-invalid-fallback){border-color:#FF5A1F}
+.field :is(:user-invalid,.user-invalid-fallback) ~ .err-msg,
+.field.is-invalid .err-msg,
+.consent-wrap.is-invalid .err-msg{display:flex}
+.field.is-invalid input,.field.is-invalid textarea{border-color:#FF5A1F}
+.consent-wrap{display:flex;flex-direction:column;gap:8px}
+.consent-lbl{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-radius:16px;border:1px solid #262A31;background:#08090B;cursor:pointer;min-height:48px;font-size:15px;line-height:1.5;color:#F3F2EE;transition:border-color .2s}
+.consent-box{flex-shrink:0;width:22px;height:22px;margin-top:1px;border-radius:6px;border:1.5px solid #3A3F48;background:#111317;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s}
+.check:checked + .consent-lbl{border-color:#D7FF3D}
+.check:checked + .consent-lbl .consent-box{background:#D7FF3D;border-color:#D7FF3D}
+.check:checked + .consent-lbl .consent-box svg{opacity:1}
+.consent-box svg{opacity:0;transition:opacity .15s}
+.check:focus-visible + .consent-lbl{outline:2px solid #D7FF3D;outline-offset:2px}
+.consent-wrap.is-invalid .consent-lbl{border-color:#FF5A1F}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.al-success{padding:48px 40px;border-radius:24px;background:#111317;border:1px solid #D7FF3D;display:flex;flex-direction:column;gap:20px}
+.al-success-badge{width:56px;height:56px;border-radius:999px;background:#D7FF3D;color:#08090B;display:flex;align-items:center;justify-content:center}
+.visually-hidden:where(:not(:focus-within,:active)){position:absolute !important;clip-path:inset(50%) !important;overflow:hidden !important;width:1px !important;height:1px !important;margin:-1px !important;padding:0 !important;border:0 !important;white-space:nowrap !important}
+@media(max-width:900px){.al-reg-grid{grid-template-columns:1fr}.al-rail{position:static}.al-step{grid-template-columns:1fr;gap:10px}.al-success{padding:32px 24px}}
+</style>
+</head>
+<body data-section="about">
+<div id="site-header"></div>
+<main>
+
+<section class="page-hero wrap">
+<svg class="coil hide-sm" width="560" height="560" viewBox="0 0 560 560" fill="none" aria-hidden="true"><circle cx="280" cy="280" r="80" stroke="#F3F2EE" stroke-opacity=".07"/><circle cx="280" cy="280" r="150" stroke="#F3F2EE" stroke-opacity=".07"/><g class="spin" style="transform-origin:280px 280px"><circle cx="280" cy="280" r="215" stroke="#D7FF3D" stroke-width="1.5" stroke-dasharray="3 9"/></g><circle cx="280" cy="280" r="275" stroke="#F3F2EE" stroke-opacity=".07"/></svg>
+<div class="crumb"><a href="index.html">Home</a>  /  <a href="about.html">About</a>  /  Alumni association</div>
+<h1 class="h1">Once a student,<br><span class="s">always current.</span></h1>
+<p class="lead">Every enrolled EEE student at HSTU is automatically a club member. Once you graduate, register with the EEE Alumni Association to stay wired into the department and mentor the next batch.</p>
+<div style="margin-top:36px;display:flex;flex-wrap:wrap;gap:12px">
+<a class="btn" href="#register">Register as alumni</a>
+<a class="btn ghost" href="#how-it-works">How it works</a>
+</div>
+</section>
+
+<section class="wrap" style="padding-bottom:120px">
+<div class="head reveal" style="margin-bottom:48px">
+<div><div class="m v">(01) — Why register</div><h2 class="h2">Stay part of<br><span class="s">the circuit.</span></h2></div>
+<p class="lead" style="margin:0;max-width:400px">From the first batch in 2013 to today’s graduating engineers — the alumni network keeps campus labs connected to real industry.</p>
+</div>
+<div class="grid reveal" style="--min:300px">
+<div class="card">
+<div style="display:flex;justify-content:space-between"><span class="m v">Mentorship</span><span class="m mu">01 / 03</span></div>
+<div class="s" style="margin-top:36px;font-size:58px;line-height:1">Mentor students.</div>
+<p>Guide undergraduate project teams, review thesis architectures and CVs, or run a clinic with any of our six technical wings.</p>
+</div>
+<div class="card volt">
+<div style="display:flex;justify-content:space-between"><span class="m">Careers</span><span class="m">02 / 03</span></div>
+<div class="s" style="margin-top:36px;font-size:58px;line-height:1">Open doors.</div>
+<p>Share internship tracks, graduate openings and industrial tour slots directly with final-year students preparing to enter the field.</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between"><span class="m v">Community</span><span class="m mu">03 / 03</span></div>
+<div class="s" style="margin-top:36px;font-size:58px;line-height:1">Reconnect.</div>
+<p>Find classmates across power, VLSI, embedded and telecom, get invited to Volt Rush and annual alumni panels in Dinajpur.</p>
+</div>
+</div>
+</section>
+
+<section class="alt sec" id="how-it-works">
+<div class="wrap" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:64px;align-items:start">
+<div class="reveal">
+<div class="m v">(02) — How it works</div>
+<h2 class="h2">Three steps,<br><span class="s">one week.</span></h2>
+<p class="lead">No fees and no long paperwork. Just enough detail so the committee can verify your batch and connect you to the right track.</p>
+</div>
+<div class="al-steps reveal">
+<div class="al-step">
+<span class="m v">Step 01</span>
+<div><h3>Register</h3><p>Fill out the form below with your session, graduation year and how you’d like to stay involved — mentoring, talks, hiring or events.</p></div>
+</div>
+<div class="al-step">
+<span class="m v">Step 02</span>
+<div><h3>Committee verifies</h3><p>The executive &amp; alumni committee checks your batch record and approves your registration within a week.</p></div>
+</div>
+<div class="al-step">
+<span class="m v">Step 03</span>
+<div><h3>Plug into events &amp; mentoring</h3><p>Once verified, you’re invited to alumni panels, wing mentoring cohorts, Volt Rush judging and lab equipment drives.</p></div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="sec wrap" id="register">
+<div class="al-reg-grid">
+<div class="al-rail reveal">
+<div class="m v">(03) — Registration</div>
+<h2 class="h2" style="margin-top:0">Join the<br><span class="s">directory.</span></h2>
+<p class="lead" style="margin-top:0">Fields marked with <span class="v">*</span> are required. Optional career details help us match you with students and local alumni chapters.</p>
+<div class="card" style="padding:24px;gap:10px">
+<span class="m v">Current student?</span>
+<p>If you’re currently enrolled in EEE at HSTU, you’re already a club member — no registration needed. <a href="about.html#wings">Explore the wings →</a></p>
+</div>
+</div>
+
+<div id="al-form-wrap">
+<form class="card" id="al-form" aria-labelledby="al-form-title" novalidate style="padding:40px;gap:24px">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:12px">
+<h3 class="h3" id="al-form-title" style="font-size:36px">Alumni registration</h3>
+<span class="m mu">Takes ~2 min</span>
+</div>
+
+<div class="al-form-sec" style="padding-top:0;border-top:0">
+<span class="m v">01 · Identity &amp; batch</span>
+<div class="al-form-row">
+<div class="field">
+<label for="al-fullName">Full name <span class="req" aria-hidden="true">*</span></label>
+<input id="al-fullName" name="fullName" type="text" required maxlength="120" autocomplete="name" enterkeyhint="next" placeholder="e.g. Shamim Reza" data-error="al-fullName-err">
+<span id="al-fullName-err" class="err-msg">Please enter your full name (up to 120 characters).</span>
+</div>
+<div class="field">
+<label for="al-email">Email <span class="req" aria-hidden="true">*</span></label>
+<input id="al-email" name="email" type="email" required maxlength="200" autocomplete="email" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="next" placeholder="you@example.com" data-error="al-email-err">
+<span id="al-email-err" class="err-msg">Enter a valid email address like you@example.com.</span>
+</div>
+</div>
+
+<div class="al-form-row">
+<div class="field">
+<label for="al-session">Session <span class="req" aria-hidden="true">*</span></label>
+<span id="al-session-hint" class="hint">Academic session, e.g. 2013-14</span>
+<input id="al-session" name="session" type="text" required maxlength="20" autocorrect="off" autocapitalize="none" enterkeyhint="next" placeholder="2013-14" aria-describedby="al-session-hint" data-error="al-session-err">
+<span id="al-session-err" class="err-msg">Enter your academic session (e.g. 2013-14).</span>
+</div>
+<div class="field">
+<label for="al-graduationYear">Graduation year <span class="req" aria-hidden="true">*</span></label>
+<span id="al-grad-hint" class="hint">Four-digit year between 2000 and 2100</span>
+<input id="al-graduationYear" name="graduationYear" type="number" required min="2000" max="2100" step="1" inputmode="numeric" enterkeyhint="next" placeholder="2018" aria-describedby="al-grad-hint" data-error="al-graduationYear-err">
+<span id="al-graduationYear-err" class="err-msg">Enter an integer year between 2000 and 2100.</span>
+</div>
+</div>
+
+<div class="al-form-row">
+<div class="field">
+<label for="al-studentId">Student ID</label>
+<input id="al-studentId" name="studentId" type="text" maxlength="40" autocorrect="off" autocapitalize="none" enterkeyhint="next" placeholder="e.g. 1302045" data-error="al-studentId-err">
+<span id="al-studentId-err" class="err-msg">Student ID must be 40 characters or fewer.</span>
+</div>
+<div class="field">
+<label for="al-phone">Phone</label>
+<input id="al-phone" name="phone" type="tel" maxlength="40" autocomplete="tel" enterkeyhint="next" placeholder="+880 1XXX-XXXXXX" data-error="al-phone-err">
+<span id="al-phone-err" class="err-msg">Phone number must be 40 characters or fewer.</span>
+</div>
+</div>
+</div>
+
+<div class="al-form-sec">
+<span class="m v">02 · Current work (optional)</span>
+<div class="al-form-row">
+<div class="field">
+<label for="al-currentRole">Current role</label>
+<input id="al-currentRole" name="currentRole" type="text" maxlength="120" autocomplete="organization-title" enterkeyhint="next" placeholder="e.g. Senior Power Systems Engineer" data-error="al-currentRole-err">
+<span id="al-currentRole-err" class="err-msg">Role must be 120 characters or fewer.</span>
+</div>
+<div class="field">
+<label for="al-organization">Organization</label>
+<input id="al-organization" name="organization" type="text" maxlength="160" autocomplete="organization" enterkeyhint="next" placeholder="Company, utility, lab or university" data-error="al-organization-err">
+<span id="al-organization-err" class="err-msg">Organization must be 160 characters or fewer.</span>
+</div>
+</div>
+
+<div class="al-form-row">
+<div class="field">
+<label for="al-city">City</label>
+<input id="al-city" name="city" type="text" maxlength="80" autocomplete="address-level2" enterkeyhint="next" placeholder="e.g. Dhaka, Dinajpur, Munich" data-error="al-city-err">
+<span id="al-city-err" class="err-msg">City must be 80 characters or fewer.</span>
+</div>
+<div class="field">
+<label for="al-linkedin">LinkedIn</label>
+<input id="al-linkedin" name="linkedin" type="text" inputmode="url" maxlength="300" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="next" placeholder="https://linkedin.com/in/username" data-error="al-linkedin-err">
+<span id="al-linkedin-err" class="err-msg">LinkedIn URL must be 300 characters or fewer.</span>
+</div>
+</div>
+</div>
+
+<div class="al-form-sec">
+<span class="m v">03 · How you’d like to plug in</span>
+<fieldset style="margin:0;padding:0;border:0">
+<legend class="m mu" style="margin-bottom:12px">Interests (optional)</legend>
+<div class="chips">
+<input class="check" type="checkbox" name="interests" id="int-mentoring" value="mentoring"><label class="chip" for="int-mentoring">Mentoring students</label>
+<input class="check" type="checkbox" name="interests" id="int-guest_talks" value="guest_talks"><label class="chip" for="int-guest_talks">Guest talks</label>
+<input class="check" type="checkbox" name="interests" id="int-hiring" value="hiring"><label class="chip" for="int-hiring">Internships &amp; hiring</label>
+<input class="check" type="checkbox" name="interests" id="int-donations" value="donations"><label class="chip" for="int-donations">Lab support &amp; donations</label>
+<input class="check" type="checkbox" name="interests" id="int-events" value="events"><label class="chip" for="int-events">Alumni events</label>
+<input class="check" type="checkbox" name="interests" id="int-research" value="research"><label class="chip" for="int-research">Research collaboration</label>
+</div>
+</fieldset>
+
+<div class="field">
+<label for="al-message">Message (optional)</label>
+<textarea id="al-message" name="message" maxlength="2000" placeholder="Share a quick note about your work, batch memories, or how you’d like to help current students…"></textarea>
+</div>
+</div>
+
+<div class="consent-wrap" id="al-consent-wrap">
+<input class="check" type="checkbox" id="al-consent" name="consent" required data-error="al-consent-err">
+<label class="consent-lbl" for="al-consent">
+<span class="consent-box" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#08090B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+<span>I agree to be contacted by the EEE Alumni Association <span class="req" aria-hidden="true">*</span></span>
+</label>
+<span id="al-consent-err" class="err-msg">Please confirm that the EEE Alumni Association may contact you.</span>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px">
+<span class="m mu">Verified within 7 days</span>
+<button class="btn" id="al-submit" type="submit">Submit registration</button>
+</div>
+<p class="m" id="al-status" role="status" aria-live="polite" style="margin:0;min-height:16px"></p>
+</form>
+</div>
+</div>
+</section>
+
+<section class="alt sec" id="faq">
+<div class="wrap" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:64px">
+<div><div class="m v">(04) — FAQ</div><h2 class="h2">Alumni,<br><span class="s">answered.</span></h2></div>
+<div style="border-top:1px solid #262A31">
+<details class="acc" open><summary>Who can register with the EEE Alumni Association?</summary><div class="body">Any graduate of the Department of Electrical &amp; Electronic Engineering at HSTU (B.Sc. or M.Sc.). If you are still an enrolled student, you are already a member of the EEE Club automatically.</div></details>
+<details class="acc"><summary>How long does verification take?</summary><div class="body">The executive &amp; alumni committee reviews new registrations weekly. Expect a confirmation email within seven days once your batch details are checked.</div></details>
+<details class="acc"><summary>Is there any alumni registration fee?</summary><div class="body">No. Registering with the directory is free. Optional lab support or event sponsorships can be coordinated directly with the committee if you choose.</div></details>
+<details class="acc"><summary>How do I update my role or email later?</summary><div class="body">Send us a quick note on the <a href="contact.html">Contact page</a> with the “Alumni” topic selected and we’ll update your record.</div></details>
+</div>
+</div>
+</section>
+
+</main>
+<div id="site-footer"></div>
+<script type="module" src="assets/db.js"></script>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  var form = document.getElementById('al-form');
+  var wrap = document.getElementById('al-form-wrap');
+  var submitBtn = document.getElementById('al-submit');
+  var statusEl = document.getElementById('al-status');
+  var consentWrap = document.getElementById('al-consent-wrap');
+  if (!form || !wrap) return;
+
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Polite live region for screen reader blur announcements
+  var announcer = document.createElement('div');
+  announcer.setAttribute('aria-live', 'polite');
+  announcer.className = 'visually-hidden';
+  document.body.appendChild(announcer);
+  var announceTimer = null;
+
+  var controls = Array.prototype.slice.call(form.querySelectorAll('input, textarea'));
+  controls.forEach(function (el) {
+    if (el.type !== 'checkbox' || el.id === 'al-consent') {
+      el.setAttribute('aria-invalid', 'false');
+    }
+  });
+
+  function linkError(el, shown) {
+    var errorId = el.getAttribute('data-error');
+    if (!errorId) return;
+    var ids = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (id) {
+      return id && id !== errorId;
+    });
+    if (shown) ids.push(errorId);
+    if (ids.length) el.setAttribute('aria-describedby', ids.join(' '));
+    else el.removeAttribute('aria-describedby');
+  }
+
+  function validateField(el) {
+    var val = el.value.trim();
+    if (el.id === 'al-fullName') return val.length >= 1 && val.length <= 120;
+    if (el.id === 'al-session') return val.length >= 1 && val.length <= 20;
+    if (el.id === 'al-graduationYear') {
+      if (!/^\d+$/.test(val)) return false;
+      var yr = Number(val);
+      return Number.isInteger(yr) && yr >= 2000 && yr <= 2100;
+    }
+    if (el.id === 'al-email') return val.length <= 200 && EMAIL_RE.test(val);
+    if (el.id === 'al-consent') return el.checked;
+    var max = el.getAttribute('maxlength');
+    if (max && val.length > Number(max)) return false;
+    return true;
+  }
+
+  function setFieldState(el, invalid, announce) {
+    var box = el.closest('.field') || (el.id === 'al-consent' ? consentWrap : null);
+    if (box) box.classList.toggle('is-invalid', invalid);
+    el.classList.toggle('user-invalid-fallback', invalid);
+    el.setAttribute('aria-invalid', invalid ? 'true' : 'false');
+    linkError(el, invalid);
+
+    if (invalid && announce) {
+      var errEl = document.getElementById(el.getAttribute('data-error') || '');
+      if (errEl) {
+        clearTimeout(announceTimer);
+        announcer.textContent = '';
+        announceTimer = setTimeout(function () {
+          announcer.textContent = errEl.textContent.trim();
+        }, 400);
+      }
+    }
+  }
+
+  controls.forEach(function (el) {
+    if (el.type === 'checkbox' && el.id !== 'al-consent') return;
+    var touched = false;
+    el.addEventListener('blur', function () {
+      if (!touched && !el.value.trim() && el.id !== 'al-consent') return;
+      touched = true;
+      setFieldState(el, !validateField(el), true);
+    });
+    el.addEventListener('input', function () {
+      touched = true;
+      if (el.getAttribute('aria-invalid') === 'true' && validateField(el)) {
+        setFieldState(el, false, false);
+      }
+    });
+    if (el.id === 'al-consent') {
+      el.addEventListener('change', function () {
+        touched = true;
+        setFieldState(el, !validateField(el), true);
+      });
+    }
+  });
+
+  function buildSuccessCard(name, isDemo) {
+    var card = document.createElement('div');
+    card.className = 'al-success';
+    card.setAttribute('role', 'status');
+    card.setAttribute('aria-live', 'polite');
+
+    var badge = document.createElement('div');
+    badge.className = 'al-success-badge';
+    badge.setAttribute('aria-hidden', 'true');
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '26');
+    svg.setAttribute('height', '26');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', '#08090B');
+    svg.setAttribute('stroke-width', '2.4');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M5 12.5l4.5 4.5L19 7.5');
+    svg.appendChild(path);
+    badge.appendChild(svg);
+
+    var tag = document.createElement('span');
+    tag.className = 'm v';
+    tag.textContent = isDemo ? 'Submitted · demo mode' : 'Registration received';
+
+    var h = document.createElement('h3');
+    h.className = 'h3';
+    h.tabIndex = -1;
+    h.style.fontSize = 'clamp(28px, 3vw, 40px)';
+    h.textContent = isDemo
+      ? 'Registration received — the committee will verify it within a week (demo — not saved)'
+      : 'Registration received — the committee will verify it within a week';
+
+    var p = document.createElement('p');
+    p.style.margin = '0';
+    p.style.color = '#B9BDC4';
+    p.style.fontSize = '17px';
+    p.style.lineHeight = '1.6';
+    p.textContent = 'Thank you, ' + name + '. We’ve logged your details and will email you once the committee completes verification.';
+
+    var actions = document.createElement('div');
+    actions.style.display = 'flex';
+    actions.style.flexWrap = 'wrap';
+    actions.style.gap = '12px';
+    actions.style.marginTop = '8px';
+
+    var eventsLink = document.createElement('a');
+    eventsLink.className = 'btn sm';
+    eventsLink.href = 'events.html';
+    eventsLink.textContent = 'Upcoming events';
+
+    var homeLink = document.createElement('a');
+    homeLink.className = 'btn ghost sm';
+    homeLink.href = 'index.html';
+    homeLink.textContent = 'Back to home';
+
+    actions.appendChild(eventsLink);
+    actions.appendChild(homeLink);
+
+    card.appendChild(badge);
+    card.appendChild(tag);
+    card.appendChild(h);
+    card.appendChild(p);
+    card.appendChild(actions);
+
+    wrap.replaceChildren(card);
+    h.focus();
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    statusEl.textContent = '';
+
+    var firstInvalid = null;
+    controls.forEach(function (el) {
+      if (el.type === 'checkbox' && el.id !== 'al-consent') return;
+      var ok = validateField(el);
+      setFieldState(el, !ok, false);
+      if (!ok && !firstInvalid) firstInvalid = el;
+    });
+
+    if (firstInvalid) {
+      statusEl.style.color = '#FF5A1F';
+      statusEl.textContent = 'Please fix the highlighted fields above.';
+      firstInvalid.focus();
+      return;
+    }
+
+    var payload = {
+      fullName: form.fullName.value.trim(),
+      session: form.session.value.trim(),
+      graduationYear: parseInt(form.graduationYear.value.trim(), 10),
+      email: form.email.value.trim(),
+      consent: true,
+      status: 'pending',
+      source: 'website',
+    };
+
+    ['studentId', 'phone', 'currentRole', 'organization', 'city', 'linkedin', 'message'].forEach(function (k) {
+      var val = form[k].value.trim();
+      if (val) payload[k] = val;
+    });
+
+    var interests = Array.prototype.slice
+      .call(form.querySelectorAll('input[name="interests"]:checked'))
+      .map(function (c) { return c.value; });
+    if (interests.length > 0) payload.interests = interests;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    statusEl.style.color = '#8A8F98';
+    statusEl.textContent = 'Submitting registration…';
+
+    try {
+      var db = window.EEEDB;
+      var res = db && typeof db.addAlumni === 'function' ? await db.addAlumni(payload) : { demo: true };
+      var isDemo = !db || !db.configured || Boolean(res && res.demo);
+      buildSuccessCard(payload.fullName.split(/\s+/)[0] || payload.fullName, isDemo);
+    } catch (err) {
+      console.error('Alumni registration failed:', err);
+      statusEl.style.color = '#FF5A1F';
+      statusEl.textContent = 'Could not send your registration right now. Please check your connection and try again.';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit registration';
+    }
+  });
+})();
+</script>
+</body>
+</html>

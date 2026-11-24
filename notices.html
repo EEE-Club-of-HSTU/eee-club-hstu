@@ -29,7 +29,8 @@
 <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-top:40px">
 <div class="chips" data-filter="cat">
 <button class="chip" data-value="all" aria-pressed="true">All</button>
-<button class="chip" data-value="membership" aria-pressed="false">Membership</button>
+<button class="chip" data-value="general" aria-pressed="false">General</button>
+<button class="chip" data-value="alumni" aria-pressed="false">Alumni</button>
 <button class="chip" data-value="events" aria-pressed="false">Events</button>
 <button class="chip" data-value="lab" aria-pressed="false">Lab</button>
 <button class="chip" data-value="publication" aria-pressed="false">Publication</button>
@@ -39,12 +40,12 @@
 </section>
 
 <section class="wrap" style="padding-bottom:140px">
-<div class="list">
-<div class="nt reveal" data-cat="membership"><span class="m mu">02 Nov 2026</span><div><span class="chip on" style="margin-bottom:12px">Pinned</span><b>Membership drive 2026/27 — apply before 30 November</b><p>New and returning members must register online. Orientation is on 5 December in the TSC Auditorium.</p></div><a class="chip plain" href="join.html">Apply →</a></div>
+<div class="list" id="notice-list">
+<div class="nt reveal" data-cat="alumni"><span class="m mu">20 Nov 2026</span><div><span class="chip on" style="margin-bottom:12px">Pinned</span><b>EEE Alumni Association registration is open</b><p>Graduates of the department can now register online. The committee verifies each registration within a week.</p></div><a class="chip plain" href="alumni.html">Register →</a></div>
 <div class="nt reveal" data-cat="events"><span class="m mu">31 Oct 2026</span><div><span class="chip" style="margin-bottom:12px">New</span><b>Volt Rush registration deadline extended to 15 November</b><p>Twelve more team slots have opened after the field layout was expanded.</p></div><a class="chip plain" href="event.html">Details →</a></div>
 <div class="nt reveal" data-cat="lab"><span class="m mu">24 Oct 2026</span><div><b>Maker space hours for the odd semester</b><p>Sunday to Thursday, 14:00 – 19:00. Soldering stations require a completed safety briefing.</p></div><span class="m mu">Lab</span></div>
 <div class="nt reveal" data-cat="publication"><span class="m mu">18 Oct 2026</span><div><b>Call for writers — Pulse Issue 08</b><p>Pitch a 600–1,200 word piece on anything electrical. Deadline 20 November.</p></div><a class="chip plain" href="magazine.html">Pulse →</a></div>
-<div class="nt reveal" data-cat="membership"><span class="m mu">12 Oct 2026</span><div><b>AGM minutes and election results published</b><p>The 2026–27 Executive Committee takes office on 1 November.</p></div><a class="chip plain" href="leadership.html">Committee →</a></div>
+<div class="nt reveal" data-cat="general"><span class="m mu">12 Oct 2026</span><div><b>AGM minutes and election results published</b><p>The 2026–27 Executive Committee takes office on 1 November.</p></div><a class="chip plain" href="leadership.html">Committee →</a></div>
 <div class="nt reveal" data-cat="events"><span class="m mu">05 Oct 2026</span><div><b>Embedded Bootcamp: 60 seats, first come first served</b><p>Kits are provided. Bring a laptop with the Arduino IDE and STM32CubeIDE installed.</p></div><a class="chip plain" href="events.html">Events →</a></div>
 <div class="nt reveal" data-cat="lab"><span class="m mu">28 Sep 2026</span><div><b>New oscilloscopes and a reflow oven in Lab 2</b><p>Thanks to alumni donations, the lab now has four 100 MHz scopes and a reflow oven for SMD work.</p></div><span class="m mu">Lab</span></div>
 </div>
@@ -52,6 +53,122 @@
 
 </main>
 <div id="site-footer"></div>
+<script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
+<script>
+(function () {
+  var CAT_LABELS = {
+    general: 'General',
+    events: 'Events',
+    lab: 'Lab',
+    publication: 'Publication',
+    alumni: 'Alumni'
+  };
+
+  function safeUrl(u) {
+    if (typeof u !== 'string') return '';
+    var s = u.trim();
+    if (!s) return '';
+    if (/^https?:\/\//i.test(s)) return s;
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(s) && s.indexOf('//') !== 0) return s;
+    return '';
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    var d = new Date(iso + (iso.length === 10 ? 'T00:00:00+06:00' : ''));
+    if (isNaN(d.getTime())) return String(iso);
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'Asia/Dhaka'
+    }).format(d);
+  }
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+    var raw = await db.getNotices();
+    if (!raw) return;
+
+    var notices = raw.slice().sort(function (a, b) {
+      var pinDiff = Number(Boolean(b.pinned)) - Number(Boolean(a.pinned));
+      if (pinDiff !== 0) return pinDiff;
+      return String(b.noticeDate || '').localeCompare(String(a.noticeDate || ''));
+    });
+
+    var listEl = document.getElementById('notice-list');
+    if (!listEl) return;
+
+    if (notices.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'mu';
+      empty.style.padding = '36px 0';
+      empty.textContent = 'No notices posted right now.';
+      listEl.replaceChildren(empty);
+      return;
+    }
+
+    var activeChip = document.querySelector('[data-filter="cat"] .chip[aria-pressed="true"]');
+    var activeCat = activeChip ? activeChip.getAttribute('data-value') : 'all';
+    var searchInput = document.querySelector('[data-search=".nt"]');
+    var q = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+    var rows = notices.map(function (n) {
+      var cat = String(n.category || 'general');
+      var row = document.createElement('div');
+      row.className = 'nt reveal in';
+      row.setAttribute('data-cat', cat);
+
+      var dateSpan = document.createElement('span');
+      dateSpan.className = 'm mu';
+      dateSpan.textContent = formatDate(n.noticeDate);
+
+      var mid = document.createElement('div');
+      if (n.pinned) {
+        var pin = document.createElement('span');
+        pin.className = 'chip on';
+        pin.style.marginBottom = '12px';
+        pin.textContent = 'Pinned';
+        mid.appendChild(pin);
+      }
+      var title = document.createElement('b');
+      title.textContent = n.title || '';
+      var body = document.createElement('p');
+      body.textContent = n.body || '';
+      mid.appendChild(title);
+      mid.appendChild(body);
+
+      var linkUrl = safeUrl(n.link);
+      var right;
+      if (linkUrl) {
+        right = document.createElement('a');
+        right.className = 'chip plain';
+        right.href = linkUrl;
+        right.textContent = 'Details →';
+      } else {
+        right = document.createElement('span');
+        right.className = 'm mu';
+        right.textContent = CAT_LABELS[cat] || cat;
+      }
+
+      row.appendChild(dateSpan);
+      row.appendChild(mid);
+      row.appendChild(right);
+
+      var catMatch = activeCat === 'all' || cat === activeCat;
+      var qMatch = !q || row.textContent.toLowerCase().indexOf(q) > -1;
+      row.hidden = !(catMatch && qMatch);
+
+      return row;
+    });
+
+    listEl.replaceChildren.apply(listEl, rows);
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
+</script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact — EEE Club of HSTU</title>
-<meta name="description" content="Get in touch with the EEE Club of HSTU — partnerships, membership, media and sponsorship.">
+<meta name="description" content="Get in touch with the EEE Club of HSTU — partnerships, alumni, media and sponsorship.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,11 +44,11 @@
 <div class="h3" style="font-size:40px">Send a signal</div>
 <fieldset style="margin:0;padding:0;border:0"><legend class="m mu" style="margin-bottom:12px">Topic</legend>
 <div class="chips">
-<input class="check" type="radio" name="topic" id="t1" value="General" checked><label class="chip" for="t1">General</label>
-<input class="check" type="radio" name="topic" id="t2" value="Partnership"><label class="chip" for="t2">Partnership</label>
-<input class="check" type="radio" name="topic" id="t3" value="Membership"><label class="chip" for="t3">Membership</label>
-<input class="check" type="radio" name="topic" id="t4" value="Media"><label class="chip" for="t4">Media</label>
-<input class="check" type="radio" name="topic" id="t5" value="Sponsorship"><label class="chip" for="t5">Sponsorship</label>
+<input class="check" type="radio" name="topic" id="t1" value="general" checked><label class="chip" for="t1">General</label>
+<input class="check" type="radio" name="topic" id="t2" value="partnership"><label class="chip" for="t2">Partnership</label>
+<input class="check" type="radio" name="topic" id="t3" value="alumni"><label class="chip" for="t3">Alumni</label>
+<input class="check" type="radio" name="topic" id="t4" value="media"><label class="chip" for="t4">Media</label>
+<input class="check" type="radio" name="topic" id="t5" value="sponsorship"><label class="chip" for="t5">Sponsorship</label>
 </div></fieldset>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
 <div class="field"><label for="c-name">Full name</label><input id="c-name" required placeholder="Your name"></div>
@@ -75,8 +75,9 @@
 <div class="wrap" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:64px">
 <div><div class="m v">(03) — FAQ</div><h2 class="h2">Questions,<br><span class="s">answered.</span></h2></div>
 <div style="border-top:1px solid #262A31">
-<details class="acc" open><summary>Who can join the EEE Club?</summary><div class="body">Any enrolled student of the Department of EEE at HSTU, from Level 1 to Level 4 and postgraduates. Students from other departments can attend selected events as guests.</div></details>
-<details class="acc"><summary>Is there a membership fee?</summary><div class="body">Yes — ৳300 per session. It covers lab consumables, the welcome kit and discounted event registrations.</div></details>
+<details class="acc" open><summary>Who is a member of the EEE Club?</summary><div class="body">Every enrolled student of the Department of EEE at HSTU, from Level 1 to Level 4 and postgraduates, is a member automatically. There’s nothing to sign up for. Students from other departments can attend selected events as guests.</div></details>
+<details class="acc"><summary>Is there a membership fee?</summary><div class="body">No. Membership is free and automatic. A few events, such as Volt Rush, have a small team registration fee.</div></details>
+<details class="acc"><summary>I’ve graduated. How do I stay involved?</summary><div class="body">Register with the <a href="alumni.html">EEE Alumni Association</a>. Once the committee verifies you, we’ll invite you to mentor, speak and meet current students.</div></details>
 <details class="acc"><summary>Do I need prior experience?</summary><div class="body">None at all. Every wing runs a beginner track in the first month, and most members built their first circuit with us.</div></details>
 <details class="acc"><summary>How can a company sponsor an event?</summary><div class="body">Choose “Sponsorship” in the form above. We’ll send our sponsorship deck with packages for Volt Rush, workshops and Pulse magazine.</div></details>
 <details class="acc"><summary>How do I verify my certificate?</summary><div class="body">Enter the ID printed on your certificate on the <a href="verify.html">Verify page</a>, or scan its QR code.</div></details>
@@ -86,15 +87,61 @@
 
 </main>
 <div id="site-footer"></div>
+<script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
 <script>
-document.getElementById('cform').addEventListener('submit', function (e) {
+document.getElementById('cform').addEventListener('submit', async function (e) {
   e.preventDefault();
-  var f = e.target, out = document.getElementById('c-out');
-  var ok = f['c-name'].value.trim() && /.+@.+\..+/.test(f['c-email'].value) && f['c-msg'].value.trim();
-  out.style.color = ok ? '#D7FF3D' : '#FF5A1F';
-  out.textContent = ok ? 'Message sent — thanks, ' + f['c-name'].value.trim().split(' ')[0] + '! (Demo: nothing was actually sent.)' : 'Please add your name, a valid email and a message.';
-  if (ok) f.reset();
+  var f = e.target;
+  var out = document.getElementById('c-out');
+  var btn = f.querySelector('button[type="submit"]');
+  var name = f['c-name'].value.trim();
+  var email = f['c-email'].value.trim();
+  var org = f['c-org'].value.trim();
+  var msg = f['c-msg'].value.trim();
+  var topicEl = f.querySelector('input[name="topic"]:checked');
+  var topic = topicEl ? topicEl.value : 'general';
+
+  var validEmail = email.length <= 200 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!name || name.length > 120 || !validEmail || !msg || msg.length > 4000 || org.length > 160) {
+    out.style.color = '#FF5A1F';
+    out.textContent = 'Please add your name, a valid email and a message.';
+    return;
+  }
+
+  var payload = {
+    name: name,
+    email: email,
+    topic: topic,
+    message: msg,
+    status: 'new'
+  };
+  if (org) payload.organization = org;
+
+  var origLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  out.style.color = '#8A8F98';
+  out.textContent = 'Sending message…';
+
+  try {
+    var db = window.EEEDB;
+    var res = db && typeof db.addContact === 'function' ? await db.addContact(payload) : { demo: true };
+    var isDemo = !db || !db.configured || Boolean(res && res.demo);
+    var first = name.split(/\s+/)[0];
+    out.style.color = '#D7FF3D';
+    out.textContent = isDemo
+      ? 'Message sent — thanks, ' + first + '! (demo — not saved)'
+      : 'Message sent — thanks, ' + first + '! We reply within 48 hours.';
+    f.reset();
+  } catch (err) {
+    console.error('Contact form failed:', err);
+    out.style.color = '#FF5A1F';
+    out.textContent = 'Could not send message right now. Please try again.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origLabel;
+  }
 });
 </script>
 </body>

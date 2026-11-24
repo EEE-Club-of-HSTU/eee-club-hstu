@@ -34,14 +34,14 @@
 </div>
 <div class="card reveal" style="flex:0 1 480px">
 <div style="display:flex;align-items:center;gap:10px"><span class="blink" style="width:8px;height:8px;border-radius:9px;background:#FF5A1F"></span><span class="m mu">Next event starts in</span></div>
-<div class="cd" data-countdown="2026-11-14T10:00:00+06:00">
+<div class="cd" id="ev-cd" data-countdown="2026-11-14T10:00:00+06:00">
 <div><b data-unit="d">00</b><span class="m mu" style="font-size:10px">Days</span></div>
 <div><b data-unit="h">00</b><span class="m mu" style="font-size:10px">Hrs</span></div>
 <div><b data-unit="m">00</b><span class="m mu" style="font-size:10px">Min</span></div>
 <div><b data-unit="s">00</b><span class="m" style="font-size:10px">Sec</span></div>
 </div>
-<div style="font-size:22px;font-weight:500">Arduino to ARM: Embedded Bootcamp</div>
-<div style="display:flex;flex-wrap:wrap;gap:10px"><a class="btn sm" href="join.html">Register</a><a class="btn ghost sm" href="#list">All events</a></div>
+<div id="cd-title" style="font-size:22px;font-weight:500">Arduino to ARM: Embedded Bootcamp</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px"><a id="cd-link" class="btn sm" href="event.html">Details</a><a class="btn ghost sm" href="#list">All events</a></div>
 </div>
 </div>
 </section>
@@ -60,8 +60,8 @@
 </div>
 
 <section class="wrap" id="list" style="padding-top:72px;padding-bottom:140px">
-<div class="head"><div class="h3">November — January</div><span class="m mu">6 upcoming</span></div>
-<div class="list" style="margin-top:28px">
+<div class="head"><div class="h3" id="ev-range">November — January</div><span class="m mu" id="ev-count">6 upcoming</span></div>
+<div class="list" id="ev-list" style="margin-top:28px">
 <a href="event.html" class="ev row" data-type="workshop"><span class="d"><b>14</b><span class="m mu">Nov · Sat</span></span><span class="t"><b>Arduino to ARM: Embedded Bootcamp</b><span class="chip">Workshop</span></span><span class="m mu where hide-sm">Room 310, EEE Building<br>10:00 — 16:00</span><span class="arrow" style="width:64px;height:64px;border-radius:999px;border:1px solid #3A3F48;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3F2EE" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></span></a>
 <a href="event.html" class="ev row" data-type="competition"><span class="d"><b>22</b><span class="m mu">Nov · Sun</span></span><span class="t"><b>Volt Rush 2026 — Inter-University Robotics Sprint</b><span class="chip on">Competition</span></span><span class="m mu where hide-sm">Central Field, HSTU<br>09:00 — 18:00</span><span class="arrow" style="width:64px;height:64px;border-radius:999px;border:1px solid #3A3F48;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3F2EE" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></span></a>
 <a href="event.html" class="ev row" data-type="seminar"><span class="d"><b>03</b><span class="m mu">Dec · Thu</span></span><span class="t"><b>Grid of Tomorrow: Talk with Power Sector Engineers</b><span class="chip">Seminar</span></span><span class="m mu where hide-sm">TSC Auditorium<br>15:00 — 17:00</span><span class="arrow" style="width:64px;height:64px;border-radius:999px;border:1px solid #3A3F48;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3F2EE" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></span></a>
@@ -73,6 +73,165 @@
 
 </main>
 <div id="site-footer"></div>
+<script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
+<script>
+(function () {
+  var TYPE_LABELS = {
+    workshop: 'Workshop',
+    competition: 'Competition',
+    seminar: 'Seminar',
+    trip: 'Field trip',
+    outreach: 'Outreach'
+  };
+
+  function safeUrl(u, fallback) {
+    if (typeof u !== 'string') return fallback;
+    var s = u.trim();
+    if (!s) return fallback;
+    if (/^https?:\/\//i.test(s)) return s;
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(s) && s.indexOf('//') !== 0) return s;
+    return fallback;
+  }
+
+  function fmtParts(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return { day: '—', meta: '', monthLong: '', time: '' };
+    var day = new Intl.DateTimeFormat('en-GB', { day: '2-digit', timeZone: 'Asia/Dhaka' }).format(d);
+    var mon = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'Asia/Dhaka' }).format(d);
+    var monLong = new Intl.DateTimeFormat('en-GB', { month: 'long', timeZone: 'Asia/Dhaka' }).format(d);
+    var wk = new Intl.DateTimeFormat('en-GB', { weekday: 'short', timeZone: 'Asia/Dhaka' }).format(d);
+    var time = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Dhaka' }).format(d);
+    return { day: day, meta: mon + ' · ' + wk, monthLong: monLong, time: time };
+  }
+
+  function makeArrow() {
+    var box = document.createElement('span');
+    box.className = 'arrow';
+    box.style.cssText = 'width:64px;height:64px;border-radius:999px;border:1px solid #3A3F48;display:flex;align-items:center;justify-content:center';
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '20');
+    svg.setAttribute('height', '20');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', '#F3F2EE');
+    svg.setAttribute('stroke-width', '2');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', 'M7 17L17 7M17 7H8M17 7v9');
+    svg.appendChild(p);
+    box.appendChild(svg);
+    return box;
+  }
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+    var all = await db.getEvents();
+    if (!all) return;
+
+    var now = Date.now();
+    var upcoming = all.filter(function (ev) {
+      var ts = Date.parse(ev.startsAt || '');
+      return !isNaN(ts) && ts >= now;
+    });
+
+    var cdEl = document.getElementById('ev-cd');
+    var cdTitle = document.getElementById('cd-title');
+    var cdLink = document.getElementById('cd-link');
+    var hero = upcoming.find(function (ev) { return ev.featured === true; }) || upcoming[0];
+    if (hero && cdEl && cdTitle && cdLink) {
+      cdEl.setAttribute('data-countdown', hero.startsAt);
+      cdTitle.textContent = hero.title || 'Upcoming event';
+      cdLink.href = safeUrl(hero.link, 'event.html');
+    } else if (cdEl && cdTitle && cdLink) {
+      cdEl.setAttribute('data-countdown', new Date().toISOString());
+      cdTitle.textContent = 'No upcoming events scheduled';
+      cdLink.href = 'archive.html';
+      cdLink.textContent = 'Archive';
+    }
+
+    var rangeEl = document.getElementById('ev-range');
+    var countEl = document.getElementById('ev-count');
+    if (countEl) countEl.textContent = upcoming.length + ' upcoming';
+    if (rangeEl) {
+      if (upcoming.length > 0) {
+        var firstM = fmtParts(upcoming[0].startsAt).monthLong;
+        var lastM = fmtParts(upcoming[upcoming.length - 1].startsAt).monthLong;
+        rangeEl.textContent = firstM === lastM ? firstM : firstM + ' — ' + lastM;
+      } else {
+        rangeEl.textContent = 'Upcoming';
+      }
+    }
+
+    var listEl = document.getElementById('ev-list');
+    if (!listEl) return;
+
+    if (upcoming.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'mu';
+      empty.style.padding = '36px 0';
+      empty.textContent = 'No upcoming events scheduled right now. Check the archive for past events.';
+      listEl.replaceChildren(empty);
+      return;
+    }
+
+    var activeChip = document.querySelector('[data-filter="type"] .chip[aria-pressed="true"]');
+    var activeFilter = activeChip ? activeChip.getAttribute('data-value') : 'all';
+
+    var rows = upcoming.map(function (ev) {
+      var type = String(ev.type || 'workshop');
+      var parts = fmtParts(ev.startsAt);
+      var endParts = ev.endsAt ? fmtParts(ev.endsAt) : null;
+      var timeStr = parts.time + (endParts && endParts.time ? ' — ' + endParts.time : '');
+
+      var a = document.createElement('a');
+      a.className = 'ev row';
+      a.href = safeUrl(ev.link, 'event.html');
+      a.setAttribute('data-type', type);
+      if (activeFilter !== 'all' && type !== activeFilter) a.hidden = true;
+
+      var dSpan = document.createElement('span');
+      dSpan.className = 'd';
+      var dayB = document.createElement('b');
+      dayB.textContent = parts.day;
+      var metaSpan = document.createElement('span');
+      metaSpan.className = 'm mu';
+      metaSpan.textContent = parts.meta;
+      dSpan.appendChild(dayB);
+      dSpan.appendChild(metaSpan);
+
+      var tSpan = document.createElement('span');
+      tSpan.className = 't';
+      var titleB = document.createElement('b');
+      titleB.textContent = ev.title || '';
+      var chip = document.createElement('span');
+      chip.className = type === 'competition' ? 'chip on' : 'chip';
+      chip.textContent = TYPE_LABELS[type] || type;
+      tSpan.appendChild(titleB);
+      tSpan.appendChild(chip);
+
+      var where = document.createElement('span');
+      where.className = 'm mu where hide-sm';
+      where.appendChild(document.createTextNode(ev.venue || ''));
+      if (timeStr) {
+        where.appendChild(document.createElement('br'));
+        where.appendChild(document.createTextNode(timeStr));
+      }
+
+      a.appendChild(dSpan);
+      a.appendChild(tSpan);
+      a.appendChild(where);
+      a.appendChild(makeArrow());
+      return a;
+    });
+
+    listEl.replaceChildren.apply(listEl, rows);
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
+</script>
 </body>
 </html>

@@ -35,7 +35,7 @@
 </section>
 
 <section class="wrap" style="padding-bottom:140px">
-<div class="grid" style="--min:320px;gap:48px 20px">
+<div class="grid" id="archive-grid" style="--min:320px;gap:48px 20px">
 <a class="past reveal" href="event.html" data-year="2026"><div class="art" style="background-color:#D7FF3D"><svg viewBox="0 0 400 300" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M0 220 C 60 150, 120 150, 180 220 S 300 290, 400 200" stroke="#08090B" stroke-width="3" opacity=".3"/></svg><span class="cap">Sep 2026 · 412 attendees</span></div><span class="m v">Competition</span><b>Circuit Sprint: 24-hour Hardware Hackathon</b></a>
 <a class="past reveal" href="event.html" data-year="2026"><div class="art"><svg viewBox="0 0 400 300" fill="none" aria-hidden="true"><circle cx="280" cy="140" r="90" stroke="#4D6BFF" stroke-width="2"/><circle cx="280" cy="140" r="50" stroke="#D7FF3D" stroke-width="2" stroke-dasharray="4 8"/></svg><span class="cap">Jul 2026 · 180 attendees</span></div><span class="m v">Seminar</span><b>Careers in Power: Alumni Panel</b></a>
 <a class="past reveal" href="event.html" data-year="2026"><div class="art" style="background-color:#4D6BFF"><svg viewBox="0 0 400 300" fill="none" aria-hidden="true"><rect x="120" y="70" width="160" height="160" rx="8" stroke="#F3F2EE" stroke-width="2"/><path d="M150 40v30M200 40v30M250 40v30M150 230v30M200 230v30M250 230v30" stroke="#F3F2EE" stroke-width="2"/></svg><span class="cap">Apr 2026 · 96 attendees</span></div><span class="m v">Workshop</span><b>RTOS from Scratch on STM32</b></a>
@@ -50,6 +50,186 @@
 
 </main>
 <div id="site-footer"></div>
+<script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
+<script>
+(function () {
+  var TYPE_LABELS = {
+    workshop: 'Workshop',
+    competition: 'Competition',
+    seminar: 'Seminar',
+    trip: 'Field trip',
+    outreach: 'Outreach'
+  };
+  var MOTIFS = [
+    { bg: '#D7FF3D', stroke: '#08090B', op: '.3' },
+    { bg: '#111317', stroke: '#4D6BFF', op: '1' },
+    { bg: '#4D6BFF', stroke: '#F3F2EE', op: '1' },
+    { bg: '#111317', stroke: '#D7FF3D', op: '1' },
+    { bg: '#FF5A1F', stroke: '#08090B', op: '.45' },
+    { bg: '#181B21', stroke: '#D7FF3D', op: '1' }
+  ];
+
+  function safeUrl(u, fallback) {
+    if (typeof u !== 'string') return fallback;
+    var s = u.trim();
+    if (!s) return fallback;
+    if (/^https?:\/\//i.test(s)) return s;
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(s) && s.indexOf('//') !== 0) return s;
+    return fallback;
+  }
+
+  function makeArt(ev, idx) {
+    var m = MOTIFS[idx % MOTIFS.length];
+    var art = document.createElement('div');
+    art.className = 'art';
+    if (m.bg !== '#111317') art.style.backgroundColor = m.bg;
+
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 400 300');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('aria-hidden', 'true');
+    if (idx % 3 === 0) {
+      var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', 'M0 220 C 60 150, 120 150, 180 220 S 300 290, 400 200');
+      p.setAttribute('stroke', m.stroke);
+      p.setAttribute('stroke-width', '3');
+      p.setAttribute('opacity', m.op);
+      svg.appendChild(p);
+    } else if (idx % 3 === 1) {
+      var c1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c1.setAttribute('cx', '200');
+      c1.setAttribute('cy', '150');
+      c1.setAttribute('r', '85');
+      c1.setAttribute('stroke', m.stroke);
+      c1.setAttribute('stroke-width', '2');
+      var c2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c2.setAttribute('cx', '200');
+      c2.setAttribute('cy', '150');
+      c2.setAttribute('r', '45');
+      c2.setAttribute('stroke', m.stroke);
+      c2.setAttribute('stroke-width', '2');
+      c2.setAttribute('stroke-dasharray', '4 8');
+      svg.appendChild(c1);
+      svg.appendChild(c2);
+    } else {
+      var r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      r.setAttribute('x', '110');
+      r.setAttribute('y', '70');
+      r.setAttribute('width', '180');
+      r.setAttribute('height', '160');
+      r.setAttribute('rx', '12');
+      r.setAttribute('stroke', m.stroke);
+      r.setAttribute('stroke-width', '2');
+      svg.appendChild(r);
+    }
+
+    var d = new Date(ev.startsAt);
+    var monYear = isNaN(d.getTime()) ? '' : new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric', timeZone: 'Asia/Dhaka' }).format(d);
+    var cap = document.createElement('span');
+    cap.className = 'cap';
+    cap.textContent = [monYear, ev.venue].filter(Boolean).join(' · ');
+
+    art.appendChild(svg);
+    art.appendChild(cap);
+    return art;
+  }
+
+  function applyYearFilter(val) {
+    document.querySelectorAll('[data-filter="year"] .chip').forEach(function (c) {
+      c.setAttribute('aria-pressed', c.getAttribute('data-value') === val);
+    });
+    document.querySelectorAll('[data-year]').forEach(function (el) {
+      el.hidden = !(val === 'all' || el.getAttribute('data-year') === val);
+    });
+  }
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+    var all = await db.getEvents();
+    if (!all) return;
+
+    var now = Date.now();
+    var past = all.filter(function (ev) {
+      var ts = Date.parse(ev.startsAt || '');
+      return !isNaN(ts) && ts < now;
+    }).sort(function (a, b) {
+      return Date.parse(b.startsAt || '') - Date.parse(a.startsAt || '');
+    });
+
+    var grid = document.getElementById('archive-grid');
+    if (!grid) return;
+
+    var activeChip = document.querySelector('[data-filter="year"] .chip[aria-pressed="true"]');
+    var activeYear = activeChip ? activeChip.getAttribute('data-value') : 'all';
+
+    // Update year filter chips to match available years
+    var filterBar = document.querySelector('[data-filter="year"]');
+    if (filterBar && past.length > 0) {
+      var yearsSet = {};
+      past.forEach(function (ev) {
+        var yr = new Intl.DateTimeFormat('en-GB', { year: 'numeric', timeZone: 'Asia/Dhaka' }).format(new Date(ev.startsAt));
+        if (yr) yearsSet[yr] = true;
+      });
+      var years = Object.keys(yearsSet).sort(function (a, b) { return Number(b) - Number(a); });
+      if (activeYear !== 'all' && !yearsSet[activeYear]) activeYear = 'all';
+
+      var chips = [];
+      var allBtn = document.createElement('button');
+      allBtn.className = 'chip';
+      allBtn.setAttribute('data-value', 'all');
+      allBtn.setAttribute('aria-pressed', activeYear === 'all' ? 'true' : 'false');
+      allBtn.textContent = 'All years';
+      allBtn.addEventListener('click', function () { applyYearFilter('all'); });
+      chips.push(allBtn);
+
+      years.forEach(function (yr) {
+        var b = document.createElement('button');
+        b.className = 'chip';
+        b.setAttribute('data-value', yr);
+        b.setAttribute('aria-pressed', activeYear === yr ? 'true' : 'false');
+        b.textContent = yr;
+        b.addEventListener('click', function () { applyYearFilter(yr); });
+        chips.push(b);
+      });
+      filterBar.replaceChildren.apply(filterBar, chips);
+    }
+
+    if (past.length === 0) {
+      var empty = document.createElement('p');
+      empty.className = 'mu';
+      empty.textContent = 'No past events archived yet.';
+      grid.replaceChildren(empty);
+      return;
+    }
+
+    var cards = past.map(function (ev, idx) {
+      var yr = new Intl.DateTimeFormat('en-GB', { year: 'numeric', timeZone: 'Asia/Dhaka' }).format(new Date(ev.startsAt));
+      var a = document.createElement('a');
+      a.className = 'past reveal in';
+      a.href = safeUrl(ev.link, 'event.html');
+      a.setAttribute('data-year', yr);
+      if (activeYear !== 'all' && yr !== activeYear) a.hidden = true;
+
+      var tag = document.createElement('span');
+      tag.className = 'm v';
+      tag.textContent = TYPE_LABELS[ev.type] || ev.type || 'Event';
+
+      var title = document.createElement('b');
+      title.textContent = ev.title || '';
+
+      a.appendChild(makeArt(ev, idx));
+      a.appendChild(tag);
+      a.appendChild(title);
+      return a;
+    });
+
+    grid.replaceChildren.apply(grid, cards);
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
+</script>
 </body>
 </html>
