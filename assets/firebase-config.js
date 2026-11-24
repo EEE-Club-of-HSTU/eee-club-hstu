@@ -1,17 +1,15 @@
-// Firebase web app configuration for the EEE Club of HSTU public site.
+// Firebase web app configuration for the EEE Club of HSTU public site
+// (Firebase project: eee-club-of-hstu).
 //
-// How to connect your Firebase project:
-// 1. Open the Firebase Console -> Project settings -> General -> Your apps.
-// 2. Select (or register) the Web app for this site and copy its `firebaseConfig` object.
-// 3. Replace the placeholder values below with your project's real values.
+// These web keys are public by design: they identify the project, while
+// access is controlled by firebase/firestore.rules.
 //
-// While `projectId` remains "YOUR_PROJECT_ID" (or any "YOUR_*" placeholder),
-// the site stays in demo mode and does not make any Firebase network requests.
+// To switch the site back to offline demo mode, set projectId to "YOUR_PROJECT_ID".
 export const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId: 'YOUR_APP_ID',
+  apiKey: 'AIzaSyBkk-Y-RzhYiz2FqDEL60BLUWpLYeudpk4',
+  authDomain: 'eee-club-of-hstu.firebaseapp.com',
+  projectId: 'eee-club-of-hstu',
+  storageBucket: 'eee-club-of-hstu.firebasestorage.app',
+  messagingSenderId: '556982375608',
+  appId: '1:556982375608:web:ca63afaecdb438e42b104d',
 };
