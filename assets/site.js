@@ -376,11 +376,21 @@
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     deferredPrompt = e;
+    var consentPending = false;
     try {
       if (localStorage.getItem('eee_pwa_dismissed') === '1') return;
+      consentPending = localStorage.getItem('eee_analytics_consent') === null;
     } catch (_e) { /* storage disabled */ }
+    // Don't stack on top of the cookie banner: wait until the visitor has answered it.
+    if (consentPending) {
+      window.addEventListener('eee:consent-decided', showPwaToast, { once: true });
+    } else {
+      showPwaToast();
+    }
+  });
 
-    if (pwaToast) return;
+  function showPwaToast() {
+    if (pwaToast || !deferredPrompt) return;
     pwaToast = document.createElement('aside');
     pwaToast.className = 'pwa-toast';
     pwaToast.setAttribute('aria-label', 'Install app');
@@ -430,7 +440,7 @@
     btns.append(laterBtn, instBtn);
     pwaToast.append(top, btns);
     document.body.appendChild(pwaToast);
-  });
+  }
 
   window.addEventListener('appinstalled', function () {
     deferredPrompt = null;

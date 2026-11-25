@@ -66,6 +66,7 @@ function showBanner() {
     } catch (_e) { /* storage disabled */ }
     window[`ga-disable-${GA_ID}`] = true;
     removeBanner();
+    window.dispatchEvent(new Event('eee:consent-decided'));
   });
 
   const acceptBtn = document.createElement('button');
@@ -78,6 +79,7 @@ function showBanner() {
     } catch (_e) { /* storage disabled */ }
     removeBanner();
     loadGtag();
+    window.dispatchEvent(new Event('eee:consent-decided'));
   });
 
   actions.append(declineBtn, acceptBtn);
