@@ -7,6 +7,19 @@
 <meta name="description" content="Lecture notes, lab manuals, datasheets and code shared by EEE Club members.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/resources.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Resources — EEE Club of HSTU">
+<meta property="og:description" content="Lecture notes, lab manuals, datasheets and code shared by EEE Club members.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/resources.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Resources — EEE Club of HSTU">
+<meta name="twitter:description" content="Lecture notes, lab manuals, datasheets and code shared by EEE Club members.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -23,6 +36,7 @@
 .tr:hover .dl svg{stroke:#08090B}
 @media(max-width:760px){.tr{grid-template-columns:1fr 56px}.tr .c2,.tr .c3,.tr .c4{display:none}}
 </style>
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="content">
 <div id="site-header"></div>
@@ -40,12 +54,12 @@
 <button class="chip" data-value="code" aria-pressed="false">Code</button>
 <button class="chip" data-value="exam" aria-pressed="false">Question banks</button>
 </div>
-<label class="field" style="flex:0 1 380px"><span class="lbl">Search 240 files</span><input type="search" data-search=".tr:not(.h)" placeholder="Course code, topic, tool…"></label>
+<label class="field" style="flex:0 1 380px"><span id="res-search-lbl" class="lbl">Search 240 files</span><input type="search" data-search=".tr:not(.h)" placeholder="Course code, topic, tool…"></label>
 </div>
 </section>
 
 <section class="wrap" style="padding-bottom:140px">
-<div class="tbl reveal">
+<div id="res-table" class="tbl reveal">
 <div class="tr h"><span class="m mu">Title</span><span class="m mu c2">Type</span><span class="m mu c3">Course</span><span class="m mu c4">Size</span><span></span></div>
 <a href="#" class="tr" data-kind="notes" style="color:#F3F2EE;text-decoration:none"><b>Circuit Analysis II — complete lecture notes</b><span class="c2"><span class="chip plain">PDF</span></span><span class="m mu c3">EEE 2101</span><span class="m mu c4">14 MB</span><span class="dl"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F3F2EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 10l6 6 6-6M5 20h14"/></svg></span></a>
 <a href="#" class="tr" data-kind="code" style="color:#F3F2EE;text-decoration:none"><b>STM32F4 starter kit &amp; peripheral cheatsheet</b><span class="c2"><span class="chip plain">ZIP</span></span><span class="m mu c3">EEE 3203</span><span class="m mu c4">2 MB</span><span class="dl"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F3F2EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 10l6 6 6-6M5 20h14"/></svg></span></a>
@@ -58,12 +72,111 @@
 <a href="#" class="tr" data-kind="exam" style="color:#F3F2EE;text-decoration:none"><b>Question bank — Level 3 Semester 2 (2019–2025)</b><span class="c2"><span class="chip plain">PDF</span></span><span class="m mu c3">All</span><span class="m mu c4">19 MB</span><span class="dl"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F3F2EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 10l6 6 6-6M5 20h14"/></svg></span></a>
 <a href="#" class="tr" data-kind="notes" style="color:#F3F2EE;text-decoration:none"><b>Control Systems — Bode &amp; root-locus crash course</b><span class="c2"><span class="chip plain">PDF</span></span><span class="m mu c3">EEE 3201</span><span class="m mu c4">6 MB</span><span class="dl"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F3F2EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 10l6 6 6-6M5 20h14"/></svg></span></a>
 </div>
-<p class="m mu" style="margin-top:20px;text-transform:none;letter-spacing:0">Demo listing — download links are placeholders.</p>
+<p id="res-demo-note" class="m mu" style="margin-top:20px;text-transform:none;letter-spacing:0">Demo listing — download links are placeholders.</p>
 </section>
 
 </main>
 <div id="site-footer"></div>
 <script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
+<script>
+(function () {
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+    var items = await db.getResources();
+    if (!items || items.length === 0) return;
+
+    var tbl = document.getElementById('res-table');
+    if (!tbl) return;
+    var header = tbl.querySelector('.tr.h');
+
+    var filterBar = document.querySelector('[data-filter="kind"]');
+    var activeChip = filterBar && filterBar.querySelector('.chip[aria-pressed="true"]');
+    var activeKind = activeChip ? activeChip.getAttribute('data-value') : 'all';
+
+    if (filterBar && items.some(function (r) { return r.kind === 'other'; })) {
+      if (!filterBar.querySelector('.chip[data-value="other"]')) {
+        var b = document.createElement('button');
+        b.className = 'chip';
+        b.setAttribute('data-value', 'other');
+        b.setAttribute('aria-pressed', 'false');
+        b.textContent = 'Other';
+        filterBar.appendChild(b);
+      }
+    }
+
+    var searchEl = document.querySelector('[data-search=".tr:not(.h)"]');
+    var q = searchEl ? searchEl.value.trim().toLowerCase() : '';
+
+    var rows = [];
+    if (header) rows.push(header);
+    items.forEach(function (r) {
+      var href = window.EEESafeUrl(r.url) || '#';
+      var kind = String(r.kind || 'other');
+      var a = document.createElement('a');
+      a.className = 'tr';
+      a.href = href;
+      if (href !== '#') {
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+      }
+      a.setAttribute('data-kind', kind);
+      a.style.cssText = 'color:#F3F2EE;text-decoration:none';
+
+      var title = document.createElement('b');
+      title.textContent = r.title || '';
+
+      var c2 = document.createElement('span');
+      c2.className = 'c2';
+      var badge = document.createElement('span');
+      badge.className = 'chip plain';
+      badge.textContent = r.fileType || 'FILE';
+      c2.appendChild(badge);
+
+      var c3 = document.createElement('span');
+      c3.className = 'm mu c3';
+      c3.textContent = r.course || '—';
+
+      var c4 = document.createElement('span');
+      c4.className = 'm mu c4';
+      c4.textContent = r.size || '—';
+
+      var dl = document.createElement('span');
+      dl.className = 'dl';
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '18');
+      svg.setAttribute('height', '18');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', '#F3F2EE');
+      svg.setAttribute('stroke-width', '2');
+      svg.setAttribute('stroke-linecap', 'round');
+      svg.setAttribute('stroke-linejoin', 'round');
+      svg.setAttribute('aria-hidden', 'true');
+      var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', 'M12 4v12M6 10l6 6 6-6M5 20h14');
+      svg.appendChild(p);
+      dl.appendChild(svg);
+
+      a.append(title, c2, c3, c4, dl);
+      var kindOk = activeKind === 'all' || kind === activeKind;
+      var qOk = !q || a.textContent.toLowerCase().indexOf(q) > -1;
+      a.hidden = !(kindOk && qOk);
+      rows.push(a);
+    });
+
+    tbl.replaceChildren.apply(tbl, rows);
+
+    var lbl = document.getElementById('res-search-lbl');
+    if (lbl) lbl.textContent = 'Search ' + items.length + ' files';
+    var note = document.getElementById('res-demo-note');
+    if (note) note.hidden = true;
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
+</script>
 </body>
 </html>

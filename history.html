@@ -7,6 +7,19 @@
 <meta name="description" content="The story of the EEE Club of HSTU, year by year.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/history.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="History — EEE Club of HSTU">
+<meta property="og:description" content="The story of the EEE Club of HSTU, year by year.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/history.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="History — EEE Club of HSTU">
+<meta name="twitter:description" content="The story of the EEE Club of HSTU, year by year.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -23,6 +36,7 @@
 .tl-item p{margin:12px 0 0;max-width:620px;font-size:17px;line-height:1.6;color:#8A8F98}
 @media(max-width:760px){.tl{padding-left:44px}.tl::before{left:8px}.tl-item{grid-template-columns:1fr;gap:12px}.tl-item::before{left:-43px}.tl-year{font-size:52px}}
 </style>
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="about">
 <div id="site-header"></div>
@@ -32,9 +46,10 @@
 <div class="crumb"><a href="index.html">Home</a>  /  <a href="about.html">About</a>  /  History</div>
 <h1 class="h1">A decade<br><span class="s">of sparks.</span></h1>
 <p class="lead">From a handful of students sharing one oscilloscope to six wings and a maker space — here’s how the current started flowing.</p>
+<p id="page-updated" class="m mu" hidden style="margin-top:16px"></p>
 </section>
 
-<section class="wrap" style="padding-bottom:140px">
+<section class="wrap" id="page-body" style="padding-bottom:140px">
 <div class="tl">
 <div class="tl-item reveal"><div class="tl-year">2004</div><div><span class="m v">Department</span><h3 style="margin-top:10px">EEE starts at HSTU</h3><p>The Department of Electrical &amp; Electronic Engineering is established under the Faculty of Computer Science and Engineering.</p></div></div>
 <div class="tl-item reveal"><div class="tl-year">2013</div><div><span class="m v">Department</span><h3 style="margin-top:10px">First B.Sc. batch</h3><p>The four-year B.Sc. in EEE begins — and with it, the first students asking for more lab time than the timetable allows.</p></div></div>
@@ -52,5 +67,48 @@
 <div id="site-footer"></div>
 <script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
+<script>
+(function () {
+  function fmtUpdated(ms) {
+    var d = new Date(Number(ms));
+    if (isNaN(d.getTime())) return '';
+    return 'Last updated · ' + new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Dhaka' }).format(d);
+  }
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+    var doc = await db.getPage('history');
+    if (!doc || !doc.content) return;
+
+    var updEl = document.getElementById('page-updated');
+    var updTxt = fmtUpdated(doc.updatedAt);
+    if (updEl && updTxt) {
+      updEl.textContent = updTxt;
+      updEl.hidden = false;
+    }
+
+    var bodyWrap = document.getElementById('page-body');
+    if (!bodyWrap) return;
+    var prose = document.createElement('div');
+    prose.className = 'prose';
+    prose.style.margin = '0 auto';
+    bodyWrap.replaceChildren(prose);
+
+    try {
+      var md = await import('./assets/markdown.js');
+      await md.renderMarkdown(prose, doc.content);
+    } catch (err) {
+      console.warn('History markdown render failed:', err);
+      var p = document.createElement('p');
+      p.style.whiteSpace = 'pre-line';
+      p.textContent = doc.content;
+      prose.replaceChildren(p);
+    }
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
+</script>
 </body>
 </html>

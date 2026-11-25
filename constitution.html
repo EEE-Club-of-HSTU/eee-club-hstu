@@ -7,10 +7,24 @@
 <meta name="description" content="The constitution of the EEE Club of HSTU.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/constitution.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Constitution — EEE Club of HSTU">
+<meta property="og:description" content="The constitution of the EEE Club of HSTU.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/constitution.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Constitution — EEE Club of HSTU">
+<meta name="twitter:description" content="The constitution of the EEE Club of HSTU.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="about">
 <div id="site-header"></div>
@@ -20,10 +34,12 @@
 <div class="crumb"><a href="index.html">Home</a>  /  <a href="about.html">About</a>  /  Constitution</div>
 <h1 class="h1">The rules of<br><span class="s">our circuit.</span></h1>
 <p class="lead">Version 3.1 · Ratified at the Annual General Meeting, 12 October 2025 · 11 articles</p>
+<p id="page-updated" class="m mu" hidden style="margin-top:16px"></p>
 <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:36px"><a class="btn" href="#articles">Read the articles</a><a class="btn ghost" href="#" onclick="window.print();return false">Print / save PDF</a></div>
 </section>
 
 <section class="wrap" id="articles" style="padding-bottom:140px">
+<div id="page-body">
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:64px;align-items:start">
 <aside class="card reveal" style="position:sticky;top:24px">
 <span class="m v">Summary</span>
@@ -48,11 +64,55 @@
 <details class="acc"><summary>Article 11 — Alumni Association</summary><div class="body">Graduates of the Department of EEE may register with the EEE Alumni Association. Registrations are verified by the Executive Committee. Alumni may mentor students, speak at events, offer internships and support the club, but do not vote at the AGM.</div></details>
 </div>
 </div>
+</div>
 </section>
 
 </main>
 <div id="site-footer"></div>
 <script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
+<script>
+(function () {
+  function fmtUpdated(ms) {
+    var d = new Date(Number(ms));
+    if (isNaN(d.getTime())) return '';
+    return 'Last updated · ' + new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Dhaka' }).format(d);
+  }
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+    var doc = await db.getPage('constitution');
+    if (!doc || !doc.content) return;
+
+    var updEl = document.getElementById('page-updated');
+    var updTxt = fmtUpdated(doc.updatedAt);
+    if (updEl && updTxt) {
+      updEl.textContent = updTxt;
+      updEl.hidden = false;
+    }
+
+    var bodyWrap = document.getElementById('page-body');
+    if (!bodyWrap) return;
+    var prose = document.createElement('div');
+    prose.className = 'prose';
+    prose.style.margin = '0 auto';
+    bodyWrap.replaceChildren(prose);
+
+    try {
+      var md = await import('./assets/markdown.js');
+      await md.renderMarkdown(prose, doc.content);
+    } catch (err) {
+      console.warn('Constitution markdown render failed:', err);
+      var p = document.createElement('p');
+      p.style.whiteSpace = 'pre-line';
+      p.textContent = doc.content;
+      prose.replaceChildren(p);
+    }
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
+</script>
 </body>
 </html>

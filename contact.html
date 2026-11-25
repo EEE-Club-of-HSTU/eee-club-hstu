@@ -7,6 +7,19 @@
 <meta name="description" content="Get in touch with the EEE Club of HSTU — partnerships, alumni, media and sponsorship.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/contact.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Contact — EEE Club of HSTU">
+<meta property="og:description" content="Get in touch with the EEE Club of HSTU — partnerships, alumni, media and sponsorship.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/contact.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Contact — EEE Club of HSTU">
+<meta name="twitter:description" content="Get in touch with the EEE Club of HSTU — partnerships, alumni, media and sponsorship.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -18,6 +31,7 @@
 .ping{transform-box:fill-box;transform-origin:center;animation:ping 2.2s ease-out infinite}
 @media (prefers-reduced-motion: reduce){.ping{animation:none}}
 </style>
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="contact">
 <div id="site-header"></div>
@@ -30,10 +44,10 @@
 <h1 class="h1">Let’s talk<br><span class="s">circuits.</span></h1>
 </div>
 <div class="list" style="flex:0 1 440px">
-<div style="display:flex;justify-content:space-between;gap:16px;padding:18px 0"><span class="m mu">Email</span><a href="mailto:eeeclub@hstu.ac.bd" style="color:#F3F2EE">eeeclub@hstu.ac.bd</a></div>
-<div style="display:flex;justify-content:space-between;gap:16px;padding:18px 0"><span class="m mu">Phone</span><span>+880 1700-000000</span></div>
-<div style="display:flex;justify-content:space-between;gap:16px;padding:18px 0"><span class="m mu">Office hours</span><span>Sun–Thu · 14:00–17:00</span></div>
-<div style="display:flex;justify-content:space-between;gap:16px;padding:18px 0"><span class="m mu">Room</span><span>EEE Building, Room 214</span></div>
+<div style="display:flex;justify-content:space-between;gap:16px;padding:18px 0"><span class="m mu">Email</span><a id="contact-email" href="mailto:eeeclub@hstu.ac.bd" style="color:#F3F2EE">eeeclub@hstu.ac.bd</a></div>
+<div style="display:flex;justify-content:space-between;gap:16px;padding:18px 0"><span class="m mu">Phone</span><span id="contact-phone">+880 1700-000000</span></div>
+<div style="display:flex;justify-content:space-between;gap:16px;padding:18px 0"><span class="m mu">Office hours</span><span id="contact-hours">Sun–Thu · 14:00–17:00</span></div>
+<div style="display:flex;justify-content:space-between;gap:16px;padding:18px 0"><span class="m mu">Room</span><span id="contact-room">EEE Building, Room 214</span></div>
 </div>
 </div>
 </section>
@@ -63,9 +77,9 @@
 <svg viewBox="0 0 600 560" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true"><path d="M-20 400 C 120 360, 220 300, 300 250 S 480 140, 640 120" stroke="#2C3038" stroke-width="26"/><path d="M200 -20 C 240 160, 270 220, 300 250 S 340 460, 320 600" stroke="#2C3038" stroke-width="16"/><path d="M-20 120 L 640 300" stroke="#22262D" stroke-width="10"/><rect x="250" y="170" width="70" height="40" rx="4" fill="#22262D"/><circle class="ping" cx="300" cy="250" r="30" fill="#D7FF3D" fill-opacity=".35"/><circle cx="300" cy="250" r="12" fill="#D7FF3D" stroke="#08090B" stroke-width="4"/></svg>
 <div style="position:absolute;left:20px;right:20px;bottom:20px;padding:22px;border-radius:22px;background:rgba(8,9,11,.88);border:1px solid #262A31;backdrop-filter:blur(10px)">
 <span class="m v">Find us</span>
-<div class="h3" style="margin-top:8px">Department of EEE, HSTU</div>
-<div class="mu" style="margin-top:4px">Basherhat, Dinajpur 5200, Bangladesh</div>
-<a class="m" href="https://www.google.com/maps/search/Hajee+Mohammad+Danesh+Science+and+Technology+University" style="display:inline-block;margin-top:12px">Open in Google Maps ↗</a>
+<div id="location-name" class="h3" style="margin-top:8px">Department of EEE, HSTU</div>
+<div id="location-address" class="mu" style="margin-top:4px">Basherhat, Dinajpur 5200, Bangladesh</div>
+<a id="location-map-link" class="m" href="https://www.google.com/maps/search/Hajee+Mohammad+Danesh+Science+and+Technology+University" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:12px">Open in Google Maps ↗</a>
 </div>
 </div>
 </div>
@@ -74,7 +88,7 @@
 <section class="alt sec" id="faq">
 <div class="wrap" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:64px">
 <div><div class="m v">(03) — FAQ</div><h2 class="h2">Questions,<br><span class="s">answered.</span></h2></div>
-<div style="border-top:1px solid #262A31">
+<div id="faq-list" style="border-top:1px solid #262A31">
 <details class="acc" open><summary>Who is a member of the EEE Club?</summary><div class="body">Every enrolled student of the Department of EEE at HSTU, from Level 1 to Level 4 and postgraduates, is a member automatically. There’s nothing to sign up for. Students from other departments can attend selected events as guests.</div></details>
 <details class="acc"><summary>Is there a membership fee?</summary><div class="body">No. Membership is free and automatic. A few events, such as Volt Rush, have a small team registration fee.</div></details>
 <details class="acc"><summary>I’ve graduated. How do I stay involved?</summary><div class="body">Register with the <a href="alumni.html">EEE Alumni Association</a>. Once the committee verifies you, we’ll invite you to mentor, speak and meet current students.</div></details>
@@ -143,6 +157,70 @@ document.getElementById('cform').addEventListener('submit', async function (e) {
     btn.textContent = origLabel;
   }
 });
+
+(function () {
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+
+    var results = await Promise.allSettled([
+      db.getFaqs(),
+      db.getSettings('footer'),
+      db.getSettings('location')
+    ]);
+
+    var faqs = results[0].status === 'fulfilled' ? results[0].value : null;
+    if (faqs && faqs.length > 0) {
+      var faqList = document.getElementById('faq-list');
+      if (faqList) {
+        var items = faqs.map(function (f, idx) {
+          var det = document.createElement('details');
+          det.className = 'acc';
+          if (idx === 0) det.open = true;
+          var sum = document.createElement('summary');
+          sum.textContent = f.question || '';
+          var body = document.createElement('div');
+          body.className = 'body';
+          body.style.whiteSpace = 'pre-line';
+          body.textContent = f.answer || '';
+          det.append(sum, body);
+          return det;
+        });
+        faqList.replaceChildren.apply(faqList, items);
+      }
+    }
+
+    var footer = results[1].status === 'fulfilled' ? results[1].value : null;
+    if (footer) {
+      var emailEl = document.getElementById('contact-email');
+      if (emailEl && typeof footer.email === 'string' && footer.email.trim()) {
+        var em = footer.email.trim();
+        emailEl.href = 'mailto:' + em;
+        emailEl.textContent = em;
+      }
+      var phoneEl = document.getElementById('contact-phone');
+      if (phoneEl && typeof footer.phone === 'string' && footer.phone.trim()) phoneEl.textContent = footer.phone.trim();
+      var hoursEl = document.getElementById('contact-hours');
+      if (hoursEl && typeof footer.officeHours === 'string' && footer.officeHours.trim()) hoursEl.textContent = footer.officeHours.trim();
+      var roomEl = document.getElementById('contact-room');
+      if (roomEl && typeof footer.room === 'string' && footer.room.trim()) roomEl.textContent = footer.room.trim();
+    }
+
+    var loc = results[2].status === 'fulfilled' ? results[2].value : null;
+    if (loc) {
+      var nameEl = document.getElementById('location-name');
+      if (nameEl && typeof loc.name === 'string' && loc.name.trim()) nameEl.textContent = loc.name.trim();
+      var addrEl = document.getElementById('location-address');
+      if (addrEl && typeof loc.address === 'string' && loc.address.trim()) addrEl.textContent = loc.address.trim();
+      var mapEl = document.getElementById('location-map-link');
+      var mUrl = window.EEESafeUrl(loc.mapUrl);
+      if (mapEl && mUrl) mapEl.href = mUrl;
+    }
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
 </script>
 </body>
 </html>

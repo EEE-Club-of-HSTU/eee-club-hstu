@@ -7,6 +7,19 @@
 <meta name="description" content="A beginner's guide to blinking an LED on STM32 by writing to registers directly, without the HAL.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/post.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Writing Your First Bare-Metal STM32 Driver — EEE Club of HSTU">
+<meta property="og:description" content="A beginner&#x27;s guide to blinking an LED on STM32 by writing to registers directly, without the HAL.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/post.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Writing Your First Bare-Metal STM32 Driver — EEE Club of HSTU">
+<meta name="twitter:description" content="A beginner&#x27;s guide to blinking an LED on STM32 by writing to registers directly, without the HAL.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -14,26 +27,27 @@
 <style>
 .bar{position:fixed;left:0;top:0;height:3px;width:0;background:#D7FF3D;z-index:60}
 </style>
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="content">
 <div class="bar" id="bar" aria-hidden="true"></div>
 <div id="site-header"></div>
 <main>
 
-<article>
+<article id="post-article">
 <header class="page-hero wrap" style="padding-bottom:56px">
-<div class="crumb"><a href="index.html">Home</a>  /  <a href="blog.html">Blog</a>  /  Tutorial</div>
-<h1 class="h1" style="font-size:clamp(48px,7vw,112px);max-width:1100px">Your first bare-metal driver for STM32 — <span class="s">no HAL, no fear.</span></h1>
+<div class="crumb"><a href="index.html">Home</a>  /  <a href="blog.html">Blog</a>  /  <span id="post-crumb">Tutorial</span></div>
+<h1 id="post-title" class="h1" style="font-size:clamp(48px,7vw,112px);max-width:1100px">Your first bare-metal driver for STM32 — <span class="s">no HAL, no fear.</span></h1>
 <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin-top:36px">
-<div style="display:flex;align-items:center;gap:12px"><span class="av" style="width:48px;height:48px;aspect-ratio:auto;border-radius:99px;font-size:20px">AM</span><span><span style="display:block">Arif Mahmud</span><span class="m mu">Head · Robotics</span></span></div>
-<span class="m mu">28 Oct 2026</span><span class="m mu">12 min read</span><span class="chip">Embedded &amp; IoT</span>
+<div style="display:flex;align-items:center;gap:12px"><span id="post-av" class="av" style="width:48px;height:48px;aspect-ratio:auto;border-radius:99px;font-size:20px">AM</span><span><span id="post-author" style="display:block">Arif Mahmud</span><span id="post-role" class="m mu">Head · Robotics</span></span></div>
+<span id="post-date" class="m mu">28 Oct 2026</span><span id="post-read" class="m mu">12 min read</span><span id="post-tag" class="chip">Embedded &amp; IoT</span>
 </div>
 </header>
 
-<div class="wrap"><div class="art" style="aspect-ratio:21/8;background-color:#4D6BFF"><svg viewBox="0 0 1260 480" fill="none" aria-hidden="true"><rect x="500" y="110" width="260" height="260" rx="14" stroke="#F3F2EE" stroke-width="3"/><rect x="565" y="175" width="130" height="130" stroke="#D7FF3D" stroke-width="3"/><path d="M540 70v40M600 70v40M660 70v40M720 70v40M540 370v40M600 370v40M660 370v40M720 370v40M460 150h40M460 210h40M460 270h40M460 330h40M760 150h40M760 210h40M760 270h40M760 330h40" stroke="#F3F2EE" stroke-width="3"/><path d="M0 410 C 200 350, 360 350, 460 300" stroke="#D7FF3D" stroke-width="2" opacity=".6"/></svg></div></div>
+<div class="wrap"><div id="post-cover" class="art" style="aspect-ratio:21/8;background-color:#4D6BFF"><svg viewBox="0 0 1260 480" fill="none" aria-hidden="true"><rect x="500" y="110" width="260" height="260" rx="14" stroke="#F3F2EE" stroke-width="3"/><rect x="565" y="175" width="130" height="130" stroke="#D7FF3D" stroke-width="3"/><path d="M540 70v40M600 70v40M660 70v40M720 70v40M540 370v40M600 370v40M660 370v40M720 370v40M460 150h40M460 210h40M460 270h40M460 330h40M760 150h40M760 210h40M760 270h40M760 330h40" stroke="#F3F2EE" stroke-width="3"/><path d="M0 410 C 200 350, 360 350, 460 300" stroke="#D7FF3D" stroke-width="2" opacity=".6"/></svg></div></div>
 
 <div class="wrap" style="padding-top:72px;padding-bottom:120px">
-<div class="prose" style="margin:0 auto">
+<div id="post-body" class="prose" style="margin:0 auto">
 <p>Most of us meet microcontrollers through a library: call <code>HAL_GPIO_TogglePin()</code>, watch an LED blink, move on. It works — until something doesn’t, and you realise you have no idea what that function actually did. This tutorial strips the library away. By the end you’ll blink an LED on an STM32F4 by writing to the chip’s registers yourself.</p>
 
 <h2>1. Every peripheral is just memory</h2>
@@ -78,8 +92,156 @@ GPIOA_MODER |=  (1u &lt;&lt; (5 * 2));</pre>
 <script>
 (function () {
   var bar = document.getElementById('bar');
-  function upd() { var h = document.documentElement; bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%'; }
-  window.addEventListener('scroll', upd, { passive: true }); upd();
+  function upd() {
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max > 0 ? (h.scrollTop / max * 100) : 0) + '%';
+  }
+  window.addEventListener('scroll', upd, { passive: true });
+  upd();
+
+  var TAG_LABELS = {
+    tutorial: 'Tutorial',
+    recap: 'Recap',
+    research: 'Research',
+    career: 'Career',
+    opinion: 'Opinion',
+    news: 'News'
+  };
+
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    var d = new Date(iso + (iso.length === 10 ? 'T00:00:00+06:00' : ''));
+    if (isNaN(d.getTime())) return String(iso);
+    return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Dhaka' }).format(d);
+  }
+
+  function makeInitials(name) {
+    var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return String(name || 'EC').trim().slice(0, 2).toUpperCase();
+  }
+
+  function setMeta(selector, val) {
+    var el = document.querySelector(selector);
+    if (el && val) el.setAttribute('content', val);
+  }
+
+  function showNotFound() {
+    document.title = 'Post not found — EEE Club of HSTU';
+    var article = document.getElementById('post-article');
+    if (!article) return;
+    var sec = document.createElement('section');
+    sec.className = 'page-hero wrap';
+    sec.style.paddingBottom = '140px';
+
+    var crumb = document.createElement('div');
+    crumb.className = 'crumb';
+    var homeA = document.createElement('a');
+    homeA.href = 'index.html';
+    homeA.textContent = 'Home';
+    var blogA = document.createElement('a');
+    blogA.href = 'blog.html';
+    blogA.textContent = 'Blog';
+    crumb.append(homeA, document.createTextNode('  /  '), blogA, document.createTextNode('  /  Not found'));
+
+    var h1 = document.createElement('h1');
+    h1.className = 'h1';
+    h1.appendChild(document.createTextNode('Post not '));
+    var s = document.createElement('span');
+    s.className = 's';
+    s.textContent = 'found.';
+    h1.appendChild(s);
+
+    var p = document.createElement('p');
+    p.className = 'lead';
+    p.textContent = 'We couldn’t find that post — it may have been moved or unpublished.';
+
+    var btn = document.createElement('a');
+    btn.className = 'btn';
+    btn.href = 'blog.html';
+    btn.style.marginTop = '32px';
+    btn.textContent = 'Back to blog';
+
+    sec.append(crumb, h1, p, btn);
+    article.replaceChildren(sec);
+  }
+
+  async function hydrate(db) {
+    var id = new URLSearchParams(location.search).get('id');
+    if (!id || !db || !db.configured) return;
+
+    var post = await db.getBlog(id);
+    if (!post) {
+      showNotFound();
+      return;
+    }
+
+    var tagLabel = TAG_LABELS[post.tag] || post.tag || 'Blog';
+    var fullTitle = (post.title || 'Post') + ' — EEE Club of HSTU';
+    document.title = fullTitle;
+    if (post.excerpt) {
+      setMeta('meta[name="description"]', post.excerpt);
+      setMeta('meta[property="og:description"]', post.excerpt);
+      setMeta('meta[name="twitter:description"]', post.excerpt);
+    }
+    setMeta('meta[property="og:title"]', fullTitle);
+    setMeta('meta[name="twitter:title"]', fullTitle);
+
+    var crumbEl = document.getElementById('post-crumb');
+    if (crumbEl) crumbEl.textContent = tagLabel;
+
+    var titleEl = document.getElementById('post-title');
+    if (titleEl) titleEl.textContent = post.title || '';
+
+    var avEl = document.getElementById('post-av');
+    if (avEl) avEl.textContent = makeInitials(post.author);
+
+    var authorEl = document.getElementById('post-author');
+    if (authorEl) authorEl.textContent = post.author || 'EEE Club';
+
+    var roleEl = document.getElementById('post-role');
+    if (roleEl) roleEl.textContent = post.authorRole || '';
+
+    var dateEl = document.getElementById('post-date');
+    if (dateEl) dateEl.textContent = formatDate(post.publishedOn);
+
+    var readEl = document.getElementById('post-read');
+    if (readEl) readEl.textContent = post.readMinutes ? post.readMinutes + ' min read' : '';
+
+    var tagEl = document.getElementById('post-tag');
+    if (tagEl) tagEl.textContent = tagLabel;
+
+    var coverUrl = window.EEESafeUrl(post.coverImageUrl);
+    var coverBox = document.getElementById('post-cover');
+    if (coverBox && coverUrl) {
+      coverBox.style.backgroundColor = '#111317';
+      var img = document.createElement('img');
+      img.src = coverUrl;
+      img.alt = post.title || 'Post cover image';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+      coverBox.replaceChildren(img);
+    }
+
+    var bodyEl = document.getElementById('post-body');
+    if (bodyEl && typeof post.content === 'string') {
+      try {
+        var md = await import('./assets/markdown.js');
+        await md.renderMarkdown(bodyEl, post.content);
+      } catch (err) {
+        console.warn('Markdown render failed:', err);
+        var fallbackP = document.createElement('p');
+        fallbackP.style.whiteSpace = 'pre-line';
+        fallbackP.textContent = post.content;
+        bodyEl.replaceChildren(fallbackP);
+      }
+    }
+    upd();
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
 })();
 </script>
 </body>

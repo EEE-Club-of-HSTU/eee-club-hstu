@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://eee-club-hstu.netlify.app/sitemap.xml

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://eee-club-hstu.netlify.app/</loc><priority>1.0</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/about.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/history.html</loc><priority>0.7</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/leadership.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/advisory.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/alumni.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/constitution.html</loc><priority>0.6</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/events.html</loc><priority>0.9</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/event.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/archive.html</loc><priority>0.7</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/notices.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/blog.html</loc><priority>0.9</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/post.html</loc><priority>0.6</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/magazine.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/resources.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/gallery.html</loc><priority>0.7</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/verify.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/contact.html</loc><priority>0.8</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/privacy.html</loc><priority>0.4</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/terms.html</loc><priority>0.4</priority></url>
+  <url><loc>https://eee-club-hstu.netlify.app/sitemap.html</loc><priority>0.5</priority></url>
+</urlset>

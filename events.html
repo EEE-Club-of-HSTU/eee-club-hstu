@@ -7,6 +7,19 @@
 <meta name="description" content="Workshops, seminars and competitions coming up at the EEE Club of HSTU.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/events.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Upcoming Events — EEE Club of HSTU">
+<meta property="og:description" content="Workshops, seminars and competitions coming up at the EEE Club of HSTU.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/events.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Upcoming Events — EEE Club of HSTU">
+<meta name="twitter:description" content="Workshops, seminars and competitions coming up at the EEE Club of HSTU.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -21,6 +34,7 @@
 .cd b{display:block;font-size:48px;font-weight:500;letter-spacing:-.03em;line-height:1}
 .cd div:last-child{background:#D7FF3D;color:#08090B}
 </style>
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="events">
 <div id="site-header"></div>
@@ -85,14 +99,6 @@
     outreach: 'Outreach'
   };
 
-  function safeUrl(u, fallback) {
-    if (typeof u !== 'string') return fallback;
-    var s = u.trim();
-    if (!s) return fallback;
-    if (/^https?:\/\//i.test(s)) return s;
-    if (!/^[a-z][a-z0-9+.-]*:/i.test(s) && s.indexOf('//') !== 0) return s;
-    return fallback;
-  }
 
   function fmtParts(iso) {
     var d = new Date(iso);
@@ -143,7 +149,7 @@
     if (hero && cdEl && cdTitle && cdLink) {
       cdEl.setAttribute('data-countdown', hero.startsAt);
       cdTitle.textContent = hero.title || 'Upcoming event';
-      cdLink.href = safeUrl(hero.link, 'event.html');
+      cdLink.href = window.EEESafeUrl(hero.link, 'event.html');
     } else if (cdEl && cdTitle && cdLink) {
       cdEl.setAttribute('data-countdown', new Date().toISOString());
       cdTitle.textContent = 'No upcoming events scheduled';
@@ -187,7 +193,7 @@
 
       var a = document.createElement('a');
       a.className = 'ev row';
-      a.href = safeUrl(ev.link, 'event.html');
+      a.href = window.EEESafeUrl(ev.link, 'event.html');
       a.setAttribute('data-type', type);
       if (activeFilter !== 'all' && type !== activeFilter) a.hidden = true;
 

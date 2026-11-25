@@ -2,6 +2,18 @@
 (function () {
   document.documentElement.classList.add('js');
 
+  var SITE_URL = 'https://eee-club-hstu.netlify.app';
+  var SITE_BASE = (function () {
+    try {
+      if (document.currentScript && document.currentScript.src) {
+        return new URL('.', document.currentScript.src).href;
+      }
+    } catch (_e) { /* fallback */ }
+    return new URL('assets/', location.href).href;
+  })();
+
+  window.EEESITE_URL = SITE_URL;
+
   var NAV = [
     { label: 'Home', href: 'index.html', key: 'home' },
     { label: 'About', key: 'about', items: [
@@ -58,16 +70,20 @@
       }).join('') + '</div></details>';
     }).join('');
 
+    var SEARCH_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
+
     return '<header class="site wrap">' + LOGO +
       '<nav class="nav" aria-label="Main">' + desk + '</nav>' +
-      '<div style="display:flex;align-items:center;gap:10px"><a class="btn sm" href="alumni.html">Alumni</a>' +
+      '<div style="display:flex;align-items:center;gap:10px">' +
+      '<button class="search-btn" type="button" aria-label="Search" title="Search (Ctrl+K or /)">' + SEARCH_ICON + '</button>' +
+      '<a class="btn sm" href="alumni.html">Alumni</a>' +
       '<button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3F2EE" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 9h16M4 15h10"/></svg></button></div>' +
       '</header>' +
       '<div class="mnav" id="mnav" role="dialog" aria-modal="true" aria-label="Menu"><div class="wrap">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 0">' + LOGO +
       '<button class="menu-close" type="button" aria-label="Close menu" style="width:48px;height:48px;border-radius:999px;border:0;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#08090B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
       '<nav aria-label="Mobile">' + mob + '</nav>' +
-      '<div style="margin-top:32px"><a class="btn" href="alumni.html">Alumni association</a></div></div></div>';
+      '<div style="margin-top:32px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="alumni.html">Alumni association</a><button class="btn ghost search-btn-mob" type="button">Search site</button></div></div></div>';
   }
 
   function col(title, links) {
@@ -92,8 +108,10 @@
       col('Content', [['Blog', 'blog.html'], ['Pulse magazine', 'magazine.html'], ['Resources', 'resources.html'], ['Gallery', 'gallery.html']]) +
       col('Club', [['Alumni association', 'alumni.html'], ['Verify a certificate', 'verify.html'], ['Contact', 'contact.html'], ['Sitemap', 'sitemap.html']]) +
       '</div></div>' +
+      '<div id="footer-contact" class="m mu" hidden style="display:flex;flex-wrap:wrap;gap:24px;margin-top:48px;padding-top:20px;border-top:1px solid #1C1F25"></div>' +
       '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;margin-top:72px;padding-top:24px;border-top:1px solid #262A31">' +
-      '<div class="m" style="display:flex;flex-wrap:wrap;gap:24px"><a href="https://facebook.com">Facebook ↗</a><a href="https://instagram.com">Instagram ↗</a><a href="https://linkedin.com">LinkedIn ↗</a><a href="https://youtube.com">YouTube ↗</a></div>' +
+      '<div id="footer-socials" class="m" style="display:flex;flex-wrap:wrap;gap:24px"><a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook ↗</a><a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><a href="https://youtube.com" target="_blank" rel="noopener noreferrer">YouTube ↗</a></div>' +
+      '<div class="m" style="display:flex;flex-wrap:wrap;align-items:center;gap:18px"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><button type="button" id="cookie-settings-btn" class="footer-link-btn">Cookie settings</button></div>' +
       '<span class="m demo-note">Demo site · names, dates &amp; numbers are sample data</span>' +
       '<span class="m mu">© 2026 EEE Club of HSTU</span></div></div>' +
       '<div aria-hidden="true" style="margin-top:40px;text-align:center;font-size:22vw;line-height:.78;font-weight:700;letter-spacing:-.06em;color:#15181D;white-space:nowrap;height:17vw;overflow:hidden">EEE CLUB</div></footer>';
@@ -184,16 +202,18 @@
   });
 
   // filters: <div data-filter="name"> chips with data-value; items with data-name="a b"
+  // Delegated so chips added later by hydration also work.
   document.querySelectorAll('[data-filter]').forEach(function (bar) {
     var name = bar.getAttribute('data-filter');
-    var chips = bar.querySelectorAll('.chip');
-    chips.forEach(function (c) {
-      c.addEventListener('click', function () {
-        var v = c.getAttribute('data-value');
-        chips.forEach(function (x) { x.setAttribute('aria-pressed', x === c); });
-        document.querySelectorAll('[data-' + name + ']').forEach(function (el) {
-          el.hidden = !(v === 'all' || (' ' + el.getAttribute('data-' + name) + ' ').indexOf(' ' + v + ' ') > -1);
-        });
+    bar.addEventListener('click', function (e) {
+      var target = e.target;
+      var chip = target && target.closest ? target.closest('.chip') : null;
+      if (!chip || !bar.contains(chip)) return;
+      var chips = bar.querySelectorAll('.chip');
+      var v = chip.getAttribute('data-value');
+      chips.forEach(function (x) { x.setAttribute('aria-pressed', x === chip); });
+      document.querySelectorAll('[data-' + name + ']').forEach(function (el) {
+        el.hidden = !(v === 'all' || (' ' + el.getAttribute('data-' + name) + ' ').indexOf(' ' + v + ' ') > -1);
       });
     });
   });
@@ -227,4 +247,193 @@
     }, { rootMargin: '0px 0px -8% 0px' });
     rv.forEach(function (el) { io.observe(el); });
   } else rv.forEach(function (el) { el.classList.add('in'); });
+
+  // site search (dynamic import)
+  function triggerSearch(initialQuery) {
+    import(SITE_BASE + 'search.js')
+      .then(function (mod) { if (mod && typeof mod.openSearch === 'function') mod.openSearch(initialQuery || ''); })
+      .catch(function (err) { console.warn('Search failed to load:', err); });
+  }
+
+  document.querySelectorAll('.search-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () { triggerSearch(''); });
+  });
+  document.querySelectorAll('.search-btn-mob').forEach(function (btn) {
+    btn.addEventListener('click', function () { setMenu(false); triggerSearch(''); });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    var tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+    var editable = tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target && e.target.isContentEditable);
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      triggerSearch('');
+      return;
+    }
+    if (e.key === '/' && !editable && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      triggerSearch('');
+    }
+  });
+
+  var urlQ = new URLSearchParams(location.search).get('q');
+  if (urlQ) triggerSearch(urlQ);
+
+  // analytics consent banner (dynamic import)
+  var consentPromise = import(SITE_BASE + 'consent.js')
+    .then(function (mod) {
+      if (mod && typeof mod.initConsent === 'function') mod.initConsent();
+      return mod;
+    })
+    .catch(function (err) {
+      console.warn('Consent module failed to load:', err);
+      return null;
+    });
+
+  var cookieBtn = document.getElementById('cookie-settings-btn');
+  if (cookieBtn) {
+    cookieBtn.addEventListener('click', function () {
+      consentPromise.then(function (mod) {
+        if (mod && typeof mod.openConsentBanner === 'function') mod.openConsentBanner();
+      });
+    });
+  }
+
+  // hydrate footer from site_settings/footer
+  function hydrateFooter(db) {
+    if (!db || !db.configured || typeof db.getSettings !== 'function') return;
+    db.getSettings('footer').then(function (s) {
+      if (!s) return;
+      var socialsEl = document.getElementById('footer-socials');
+      if (socialsEl) {
+        var specs = [
+          ['facebookUrl', 'Facebook ↗'],
+          ['instagramUrl', 'Instagram ↗'],
+          ['linkedinUrl', 'LinkedIn ↗'],
+          ['youtubeUrl', 'YouTube ↗'],
+          ['githubUrl', 'GitHub ↗']
+        ];
+        var hasAnyKey = specs.some(function (sp) { return Object.prototype.hasOwnProperty.call(s, sp[0]); });
+        if (hasAnyKey) {
+          var links = [];
+          specs.forEach(function (sp) {
+            var url = window.EEESafeUrl(s[sp[0]], '');
+            if (!url || !/^https:\/\//i.test(url)) return;
+            var a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = sp[1];
+            links.push(a);
+          });
+          socialsEl.replaceChildren.apply(socialsEl, links);
+        }
+      }
+
+      var contactEl = document.getElementById('footer-contact');
+      if (contactEl) {
+        var parts = [];
+        if (typeof s.email === 'string' && s.email.trim()) {
+          var mail = document.createElement('a');
+          mail.href = 'mailto:' + s.email.trim();
+          mail.style.color = '#F3F2EE';
+          mail.textContent = s.email.trim();
+          parts.push(mail);
+        }
+        [s.phone, s.officeHours, s.room, s.address].forEach(function (v) {
+          if (typeof v === 'string' && v.trim()) {
+            var sp = document.createElement('span');
+            sp.textContent = v.trim();
+            parts.push(sp);
+          }
+        });
+        if (parts.length > 0) {
+          contactEl.replaceChildren.apply(contactEl, parts);
+          contactEl.hidden = false;
+        }
+      }
+    });
+  }
+
+  if (window.EEEDB) hydrateFooter(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrateFooter(e.detail || window.EEEDB); }, { once: true });
+
+  // PWA service worker registration + install prompt
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/sw.js').catch(function (err) {
+        console.warn('Service worker registration failed:', err);
+      });
+    });
+  }
+
+  var deferredPrompt = null;
+  var pwaToast = null;
+  function removePwaToast() {
+    if (pwaToast && pwaToast.parentNode) pwaToast.parentNode.removeChild(pwaToast);
+    pwaToast = null;
+  }
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    try {
+      if (localStorage.getItem('eee_pwa_dismissed') === '1') return;
+    } catch (_e) { /* storage disabled */ }
+
+    if (pwaToast) return;
+    pwaToast = document.createElement('aside');
+    pwaToast.className = 'pwa-toast';
+    pwaToast.setAttribute('aria-label', 'Install app');
+
+    var top = document.createElement('div');
+    top.style.cssText = 'display:flex;align-items:center;gap:12px';
+    var img = document.createElement('img');
+    img.src = 'assets/icons/icon-192.png';
+    img.alt = '';
+    img.width = 40;
+    img.height = 40;
+    img.style.borderRadius = '10px';
+    var meta = document.createElement('div');
+    var ttl = document.createElement('div');
+    ttl.style.cssText = 'font-weight:500;font-size:15px';
+    ttl.textContent = 'Install EEE Club app';
+    var sub = document.createElement('div');
+    sub.className = 'mu';
+    sub.style.fontSize = '13px';
+    sub.textContent = 'Offline access and quick launch from your home screen.';
+    meta.append(ttl, sub);
+    top.append(img, meta);
+
+    var btns = document.createElement('div');
+    btns.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';
+    var laterBtn = document.createElement('button');
+    laterBtn.type = 'button';
+    laterBtn.className = 'btn ghost sm';
+    laterBtn.textContent = 'Not now';
+    laterBtn.addEventListener('click', function () {
+      try { localStorage.setItem('eee_pwa_dismissed', '1'); } catch (_e) { /* ignore */ }
+      removePwaToast();
+    });
+    var instBtn = document.createElement('button');
+    instBtn.type = 'button';
+    instBtn.className = 'btn sm';
+    instBtn.textContent = 'Install';
+    instBtn.addEventListener('click', async function () {
+      if (!deferredPrompt) return;
+      try {
+        await deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+      } catch (_err) { /* ignore */ }
+      deferredPrompt = null;
+      removePwaToast();
+    });
+    btns.append(laterBtn, instBtn);
+    pwaToast.append(top, btns);
+    document.body.appendChild(pwaToast);
+  });
+
+  window.addEventListener('appinstalled', function () {
+    deferredPrompt = null;
+    removePwaToast();
+  });
 })();

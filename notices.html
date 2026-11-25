@@ -7,6 +7,19 @@
 <meta name="description" content="Announcements, deadlines and notices from the EEE Club of HSTU.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/notices.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Notices — EEE Club of HSTU">
+<meta property="og:description" content="Announcements, deadlines and notices from the EEE Club of HSTU.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/notices.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Notices — EEE Club of HSTU">
+<meta name="twitter:description" content="Announcements, deadlines and notices from the EEE Club of HSTU.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -17,6 +30,7 @@
 .nt p{margin:8px 0 0;color:#8A8F98;line-height:1.55}
 @media(max-width:760px){.nt{grid-template-columns:1fr;gap:10px}}
 </style>
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="events">
 <div id="site-header"></div>
@@ -65,14 +79,6 @@
     alumni: 'Alumni'
   };
 
-  function safeUrl(u) {
-    if (typeof u !== 'string') return '';
-    var s = u.trim();
-    if (!s) return '';
-    if (/^https?:\/\//i.test(s)) return s;
-    if (!/^[a-z][a-z0-9+.-]*:/i.test(s) && s.indexOf('//') !== 0) return s;
-    return '';
-  }
 
   function formatDate(iso) {
     if (!iso) return '';
@@ -139,7 +145,7 @@
       mid.appendChild(title);
       mid.appendChild(body);
 
-      var linkUrl = safeUrl(n.link);
+      var linkUrl = window.EEESafeUrl(n.link);
       var right;
       if (linkUrl) {
         right = document.createElement('a');

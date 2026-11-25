@@ -7,10 +7,69 @@
 <meta name="description" content="The student engineering club of HSTU's Department of Electrical & Electronic Engineering.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="EEE Club of HSTU">
+<meta property="og:description" content="The student engineering club of HSTU&#x27;s Department of Electrical &amp; Electronic Engineering.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EEE Club of HSTU">
+<meta name="twitter:description" content="The student engineering club of HSTU&#x27;s Department of Electrical &amp; Electronic Engineering.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "EEE Club of HSTU",
+  "alternateName": "Electrical and Electronic Engineering Club of HSTU",
+  "url": "https://eee-club-hstu.netlify.app",
+  "logo": "https://eee-club-hstu.netlify.app/assets/logo.png",
+  "image": "https://eee-club-hstu.netlify.app/assets/og.png",
+  "description": "The student engineering club of HSTU's Department of Electrical & Electronic Engineering.",
+  "email": "eeeclub@hstu.ac.bd",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Department of EEE, HSTU, Basherhat",
+    "addressLocality": "Dinajpur",
+    "postalCode": "5200",
+    "addressCountry": "BD"
+  },
+  "parentOrganization": {
+    "@type": "CollegeOrUniversity",
+    "name": "Hajee Mohammad Danesh Science & Technology University",
+    "alternateName": "HSTU",
+    "url": "https://hstu.ac.bd"
+  },
+  "sameAs": [
+    "https://facebook.com",
+    "https://instagram.com",
+    "https://linkedin.com",
+    "https://youtube.com"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "EEE Club of HSTU",
+  "url": "https://eee-club-hstu.netlify.app",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://eee-club-hstu.netlify.app/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+<script src="assets/safe-url.js"></script>
 </head>
 <body id="top" data-section="home">
 <div style="width: 100%; overflow-x: hidden">
@@ -197,6 +256,14 @@
 </div>
 </section>
 
+<section id="partners" class="wrap" hidden style="padding-top: 20px; padding-bottom: 120px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px">
+<div><div class="m" style="color: #D7FF3D">Partners &amp; Collaborators</div><div style="margin-top: 24px; font-size: clamp(44px, 6vw, 88px); line-height: 0.94; font-weight: 500; letter-spacing: -0.04em">Built with <span class="s">our partners.</span></div></div>
+<a href="contact.html" class="m" style="color: #8A8F98; text-decoration: none">Partner with us →</a>
+</div>
+<div id="partners-grid" class="partners-grid"></div>
+</section>
+
 <section id="alumni" style="background: #D7FF3D; color: #08090B; border-radius: 48px 48px 0 0">
 <div class="wrap" style="padding-top: 72px; padding-bottom: 88px">
 <div class="m">(06) — EEE Alumni Association · Registration open</div>
@@ -231,14 +298,6 @@
     outreach: 'Outreach'
   };
 
-  function safeUrl(u, fallback) {
-    if (typeof u !== 'string') return fallback;
-    var s = u.trim();
-    if (!s) return fallback;
-    if (/^https?:\/\//i.test(s)) return s;
-    if (!/^[a-z][a-z0-9+.-]*:/i.test(s) && s.indexOf('//') !== 0) return s;
-    return fallback;
-  }
 
   function fmtParts(iso) {
     var d = new Date(iso);
@@ -300,7 +359,7 @@
       var timeStr = parts.time + (endParts && endParts.time ? ' — ' + endParts.time : '');
 
       var a = document.createElement('a');
-      a.href = safeUrl(ev.link, 'event.html');
+      a.href = window.EEESafeUrl(ev.link, 'event.html');
       a.className = 'row';
       a.style.cssText = 'display: flex; flex-wrap: wrap; align-items: center; gap: 32px; padding: 32px 0; border-top: 1px solid #262A31; color: #F3F2EE; text-decoration: none; border-radius: 20px';
 
@@ -349,8 +408,82 @@
     list.replaceChildren.apply(list, rows);
   }
 
-  if (window.EEEDB) hydrate(window.EEEDB);
-  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+  function makeInitials(name) {
+    var words = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return String(name || 'EC').trim().slice(0, 2).toUpperCase();
+  }
+
+  async function hydratePartners(db) {
+    if (!db || !db.configured || typeof db.getPartners !== 'function') return;
+    var sec = document.getElementById('partners');
+    var grid = document.getElementById('partners-grid');
+    if (!sec || !grid) return;
+
+    var partners = await db.getPartners();
+    if (!partners || partners.length === 0) return;
+
+    var cards = partners.map(function (p) {
+      var site = window.EEESafeUrl(p.website, '');
+      var isExternal = /^https:\/\//i.test(site);
+      var card = document.createElement(isExternal ? 'a' : 'div');
+      card.className = 'partner-card';
+      if (isExternal) {
+        card.href = site;
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+      }
+
+      var logoBox = document.createElement('div');
+      logoBox.className = 'partner-logo';
+      var logoSrc = window.EEESafeUrl(p.logoUrl, '');
+      function showMark() {
+        var mark = document.createElement('span');
+        mark.className = 'partner-mark';
+        mark.textContent = makeInitials(p.name);
+        logoBox.replaceChildren(mark);
+      }
+      if (logoSrc) {
+        var img = document.createElement('img');
+        img.src = logoSrc;
+        img.alt = p.name || 'Partner logo';
+        img.loading = 'lazy';
+        img.addEventListener('error', showMark, { once: true });
+        logoBox.appendChild(img);
+      } else {
+        showMark();
+      }
+
+      var info = document.createElement('div');
+      info.style.minWidth = '0';
+      var nameEl = document.createElement('div');
+      nameEl.style.cssText = 'font-size:18px;font-weight:500;line-height:1.25';
+      nameEl.textContent = p.name || '';
+      info.appendChild(nameEl);
+
+      if (p.category) {
+        var catEl = document.createElement('div');
+        catEl.className = 'm mu';
+        catEl.style.cssText = 'margin-top:4px;font-size:10px';
+        catEl.textContent = p.category;
+        info.appendChild(catEl);
+      }
+
+      card.append(logoBox, info);
+      return card;
+    });
+
+    grid.replaceChildren.apply(grid, cards);
+    sec.hidden = false;
+  }
+
+  function runAll(db) {
+    hydrate(db);
+    hydratePartners(db);
+  }
+
+  if (window.EEEDB) runAll(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { runAll(e.detail || window.EEEDB); }, { once: true });
 })();
 </script>
 <script>

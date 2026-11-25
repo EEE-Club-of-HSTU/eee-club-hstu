@@ -7,6 +7,19 @@
 <meta name="description" content="Tutorials, event recaps, research notes and opinions from EEE Club members.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/blog.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Blog — EEE Club of HSTU">
+<meta property="og:description" content="Tutorials, event recaps, research notes and opinions from EEE Club members.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/blog.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Blog — EEE Club of HSTU">
+<meta name="twitter:description" content="Tutorials, event recaps, research notes and opinions from EEE Club members.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -20,6 +33,7 @@
 .feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(440px,100%),1fr));gap:48px;align-items:center;color:#F3F2EE;text-decoration:none}
 .feat .art{aspect-ratio:16/11}
 </style>
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="content">
 <div id="site-header"></div>
@@ -31,7 +45,7 @@
 <p class="lead">Tutorials, recaps and research notes — written by members, reviewed by the wings.</p>
 </section>
 
-<section class="wrap" style="padding-bottom:96px">
+<section class="wrap" id="blog-featured" style="padding-bottom:96px">
 <a class="feat reveal" href="post.html">
 <div class="art" style="background-color:#4D6BFF"><svg viewBox="0 0 640 440" fill="none" aria-hidden="true"><rect x="200" y="100" width="240" height="240" rx="12" stroke="#F3F2EE" stroke-width="2.5"/><rect x="260" y="160" width="120" height="120" stroke="#D7FF3D" stroke-width="2.5"/><path d="M240 60v40M290 60v40M350 60v40M400 60v40M240 340v40M290 340v40M350 340v40M400 340v40M160 140h40M160 190h40M160 250h40M160 300h40M440 140h40M440 190h40M440 250h40M440 300h40" stroke="#F3F2EE" stroke-width="2.5"/></svg><span class="cap">Featured · Tutorial</span></div>
 <div><span class="m v">Embedded &amp; IoT · 12 min read</span><div style="margin-top:16px;font-size:clamp(34px,4vw,56px);line-height:1.02;font-weight:500;letter-spacing:-.03em">Writing your first bare-metal driver for STM32 — no HAL, no fear</div><p class="lead" style="margin-top:18px">Registers, clocks and a blinking LED: what actually happens between <code style="font-family:'JetBrains Mono',monospace;color:#D7FF3D">main()</code> and the pin.</p><div class="m mu" style="margin-top:24px">Arif Mahmud · 28 Oct 2026</div></div>
@@ -48,7 +62,7 @@
 <button class="chip" data-value="research" aria-pressed="false">Research</button>
 <button class="chip" data-value="career" aria-pressed="false">Career</button>
 </div></div>
-<div class="grid" style="--min:320px;gap:56px 24px;margin-top:48px">
+<div class="grid" id="blog-grid" style="--min:320px;gap:56px 24px;margin-top:48px">
 <a class="post reveal" href="post.html" data-tag="recap"><div class="art" style="background-color:#D7FF3D"><svg viewBox="0 0 400 250" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M0 180 C 60 110, 120 110, 180 180 S 300 250, 400 160" stroke="#08090B" stroke-width="3" opacity=".3"/></svg><span class="cap">Recap</span></div><span class="m mu">22 Oct 2026 · 5 min</span><b>Inside Circuit Sprint: 24 hours, 41 teams, one very tired soldering iron</b><p>What worked, what melted, and the winning team’s air-quality monitor.</p></a>
 <a class="post reveal" href="post.html" data-tag="research"><div class="art"><svg viewBox="0 0 400 250" fill="none" aria-hidden="true"><path d="M40 210 L40 120 L120 120 L120 70 L220 70 L220 150 L360 150 L360 210" stroke="#D7FF3D" stroke-width="2"/></svg><span class="cap">Research</span></div><span class="m mu">15 Oct 2026 · 8 min</span><b>How our solar micro-grid kept a school lit through monsoon season</b><p>Six months of load data from the Power &amp; Energy wing’s 5 kW installation.</p></a>
 <a class="post reveal" href="post.html" data-tag="career"><div class="art" style="background-color:#181B21"><svg viewBox="0 0 400 250" fill="none" aria-hidden="true"><circle cx="200" cy="125" r="70" stroke="#4D6BFF" stroke-width="2"/><circle cx="200" cy="125" r="30" stroke="#F3F2EE" stroke-width="2"/></svg><span class="cap">Career</span></div><span class="m mu">08 Oct 2026 · 6 min</span><b>From EEE Club to silicon: three alumni on breaking into chip design</b><p>Advice on courses, tools and the first interview from people who did it.</p></a>
@@ -63,5 +77,174 @@
 <div id="site-footer"></div>
 <script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
+<script>
+(function () {
+  var TAG_LABELS = {
+    tutorial: 'Tutorial',
+    recap: 'Recap',
+    research: 'Research',
+    career: 'Career',
+    opinion: 'Opinion',
+    news: 'News'
+  };
+  var MOTIFS = [
+    { bg: '#4D6BFF', stroke: '#F3F2EE', op: '1' },
+    { bg: '#D7FF3D', stroke: '#08090B', op: '.3' },
+    { bg: '#111317', stroke: '#D7FF3D', op: '1' },
+    { bg: '#181B21', stroke: '#4D6BFF', op: '1' },
+    { bg: '#FF5A1F', stroke: '#08090B', op: '.45' }
+  ];
+
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    var d = new Date(iso + (iso.length === 10 ? 'T00:00:00+06:00' : ''));
+    if (isNaN(d.getTime())) return String(iso);
+    return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Dhaka' }).format(d);
+  }
+
+  function makeArt(post, idx, capText) {
+    var art = document.createElement('div');
+    art.className = 'art';
+    var imgUrl = window.EEESafeUrl(post.coverImageUrl);
+    if (imgUrl) {
+      var img = document.createElement('img');
+      img.src = imgUrl;
+      img.alt = post.title || 'Post cover';
+      img.loading = 'lazy';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+      art.appendChild(img);
+    } else {
+      var m = MOTIFS[idx % MOTIFS.length];
+      if (m.bg !== '#111317') art.style.backgroundColor = m.bg;
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 400 250');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('aria-hidden', 'true');
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', idx % 2 === 0
+        ? 'M0 180 C 60 110, 120 110, 180 180 S 300 250, 400 160'
+        : 'M40 210 L40 120 L120 120 L120 70 L220 70 L220 150 L360 150 L360 210');
+      path.setAttribute('stroke', m.stroke);
+      path.setAttribute('stroke-width', '2.5');
+      path.setAttribute('opacity', m.op);
+      svg.appendChild(path);
+      art.appendChild(svg);
+    }
+    var cap = document.createElement('span');
+    cap.className = 'cap';
+    cap.textContent = capText;
+    art.appendChild(cap);
+    return art;
+  }
+
+  function applyFilter(val) {
+    document.querySelectorAll('[data-filter="tag"] .chip').forEach(function (c) {
+      c.setAttribute('aria-pressed', c.getAttribute('data-value') === val);
+    });
+    document.querySelectorAll('[data-tag]').forEach(function (el) {
+      el.hidden = !(val === 'all' || el.getAttribute('data-tag') === val);
+    });
+  }
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+    var posts = await db.getBlogs();
+    if (!posts || posts.length === 0) return;
+
+    var feat = posts.find(function (p) { return p.featured === true; }) || posts[0];
+    var rest = posts.filter(function (p) { return p.id !== feat.id; });
+
+    var featWrap = document.getElementById('blog-featured');
+    if (featWrap && feat) {
+      var a = document.createElement('a');
+      a.className = 'feat reveal in';
+      a.href = 'post.html?id=' + encodeURIComponent(feat.id);
+
+      var tagLbl = TAG_LABELS[feat.tag] || feat.tag || 'Post';
+      a.appendChild(makeArt(feat, 0, 'Featured · ' + tagLbl));
+
+      var info = document.createElement('div');
+      var eyebrow = document.createElement('span');
+      eyebrow.className = 'm v';
+      eyebrow.textContent = [tagLbl, feat.readMinutes ? feat.readMinutes + ' min read' : ''].filter(Boolean).join(' · ');
+
+      var h = document.createElement('div');
+      h.style.cssText = 'margin-top:16px;font-size:clamp(34px,4vw,56px);line-height:1.02;font-weight:500;letter-spacing:-.03em';
+      h.textContent = feat.title || '';
+
+      var excerpt = document.createElement('p');
+      excerpt.className = 'lead';
+      excerpt.style.marginTop = '18px';
+      excerpt.textContent = feat.excerpt || '';
+
+      var by = document.createElement('div');
+      by.className = 'm mu';
+      by.style.marginTop = '24px';
+      by.textContent = [feat.author, formatDate(feat.publishedOn)].filter(Boolean).join(' · ');
+
+      info.append(eyebrow, h, excerpt, by);
+      a.appendChild(info);
+      featWrap.replaceChildren(a);
+    }
+
+    var filterBar = document.querySelector('[data-filter="tag"]');
+    var activeChip = filterBar && filterBar.querySelector('.chip[aria-pressed="true"]');
+    var activeTag = activeChip ? activeChip.getAttribute('data-value') : 'all';
+
+    if (filterBar) {
+      rest.forEach(function (p) {
+        var t = String(p.tag || '').trim();
+        if (t && !filterBar.querySelector('.chip[data-value="' + t + '"]')) {
+          var b = document.createElement('button');
+          b.className = 'chip';
+          b.setAttribute('data-value', t);
+          b.setAttribute('aria-pressed', 'false');
+          b.textContent = TAG_LABELS[t] || t;
+          b.addEventListener('click', function () { applyFilter(t); });
+          filterBar.appendChild(b);
+        }
+      });
+    }
+
+    var grid = document.getElementById('blog-grid');
+    if (grid) {
+      if (rest.length === 0) {
+        var msg = document.createElement('p');
+        msg.className = 'mu';
+        msg.textContent = 'More posts coming soon.';
+        grid.replaceChildren(msg);
+        return;
+      }
+
+      var cards = rest.map(function (p, idx) {
+        var tag = String(p.tag || 'news');
+        var card = document.createElement('a');
+        card.className = 'post reveal in';
+        card.href = 'post.html?id=' + encodeURIComponent(p.id);
+        card.setAttribute('data-tag', tag);
+        if (activeTag !== 'all' && tag !== activeTag) card.hidden = true;
+
+        var meta = document.createElement('span');
+        meta.className = 'm mu';
+        meta.textContent = [formatDate(p.publishedOn), p.readMinutes ? p.readMinutes + ' min' : ''].filter(Boolean).join(' · ');
+
+        var title = document.createElement('b');
+        title.textContent = p.title || '';
+
+        var ex = document.createElement('p');
+        ex.textContent = p.excerpt || '';
+
+        card.append(makeArt(p, idx + 1, TAG_LABELS[tag] || tag), meta, title, ex);
+        return card;
+      });
+      grid.replaceChildren.apply(grid, cards);
+    }
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
+</script>
 </body>
 </html>

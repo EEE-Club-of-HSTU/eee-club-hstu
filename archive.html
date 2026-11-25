@@ -7,6 +7,19 @@
 <meta name="description" content="Past workshops, competitions and seminars run by the EEE Club of HSTU.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/archive.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Event Archive — EEE Club of HSTU">
+<meta property="og:description" content="Past workshops, competitions and seminars run by the EEE Club of HSTU.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/archive.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Event Archive — EEE Club of HSTU">
+<meta name="twitter:description" content="Past workshops, competitions and seminars run by the EEE Club of HSTU.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -17,6 +30,7 @@
 .past:hover .art{transform:scale(1.02)}
 .past b{font-size:24px;font-weight:500;letter-spacing:-.01em}
 </style>
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="events">
 <div id="site-header"></div>
@@ -70,14 +84,6 @@
     { bg: '#181B21', stroke: '#D7FF3D', op: '1' }
   ];
 
-  function safeUrl(u, fallback) {
-    if (typeof u !== 'string') return fallback;
-    var s = u.trim();
-    if (!s) return fallback;
-    if (/^https?:\/\//i.test(s)) return s;
-    if (!/^[a-z][a-z0-9+.-]*:/i.test(s) && s.indexOf('//') !== 0) return s;
-    return fallback;
-  }
 
   function makeArt(ev, idx) {
     var m = MOTIFS[idx % MOTIFS.length];
@@ -207,7 +213,7 @@
       var yr = new Intl.DateTimeFormat('en-GB', { year: 'numeric', timeZone: 'Asia/Dhaka' }).format(new Date(ev.startsAt));
       var a = document.createElement('a');
       a.className = 'past reveal in';
-      a.href = safeUrl(ev.link, 'event.html');
+      a.href = window.EEESafeUrl(ev.link, 'event.html');
       a.setAttribute('data-year', yr);
       if (activeYear !== 'all' && yr !== activeYear) a.hidden = true;
 

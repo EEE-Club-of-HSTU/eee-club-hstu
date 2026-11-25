@@ -7,6 +7,19 @@
 <meta name="description" content="The executive committee, alumni, advisors and taskforce of the EEE Club of HSTU.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/leadership.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Leadership — EEE Club of HSTU">
+<meta property="og:description" content="The executive committee, alumni, advisors and taskforce of the EEE Club of HSTU.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/leadership.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Leadership — EEE Club of HSTU">
+<meta name="twitter:description" content="The executive committee, alumni, advisors and taskforce of the EEE Club of HSTU.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -17,6 +30,7 @@
 .ppl .m{margin-top:8px}
 .ppl .sub{margin-top:6px;font-size:14px;color:#8A8F98}
 </style>
+<script src="assets/safe-url.js"></script>
 </head>
 <body data-section="about">
 <div id="site-header"></div>
@@ -92,5 +106,77 @@
 <div id="site-footer"></div>
 <script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
+<script>
+(function () {
+
+  function makeInitials(name) {
+    var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return String(name || 'EC').trim().slice(0, 2).toUpperCase();
+  }
+
+  function makeCard(m) {
+    var art = document.createElement('article');
+    art.className = 'person';
+
+    var photo = window.EEESafeUrl(m.photoUrl);
+    if (photo) {
+      var wrap = document.createElement('div');
+      wrap.style.cssText = 'overflow:hidden;border-radius:20px';
+      var img = document.createElement('img');
+      img.className = 'portrait';
+      img.src = photo;
+      img.alt = m.name || 'Club member';
+      img.loading = 'lazy';
+      wrap.appendChild(img);
+      art.appendChild(wrap);
+    } else {
+      var av = document.createElement('div');
+      av.className = 'av';
+      av.textContent = makeInitials(m.name);
+      art.appendChild(av);
+    }
+
+    var h3 = document.createElement('h3');
+    h3.textContent = m.name || '';
+    var role = document.createElement('div');
+    role.className = 'm v';
+    role.textContent = m.role || '';
+    art.append(h3, role);
+
+    if (m.subtitle) {
+      var sub = document.createElement('div');
+      sub.className = 'sub';
+      sub.textContent = m.subtitle;
+      art.appendChild(sub);
+    }
+    return art;
+  }
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+    var members = await db.getMembers();
+    if (!members || members.length === 0) return;
+
+    var groups = { executive: [], alumni: [], advisory: [], taskforce: [] };
+    members.forEach(function (m) {
+      if (groups[m.category]) groups[m.category].push(m);
+    });
+
+    Object.keys(groups).forEach(function (cat) {
+      var list = groups[cat];
+      if (!list.length) return;
+      var panel = document.querySelector('[data-panel-id="' + cat + '"]');
+      var grid = panel && panel.querySelector('.ppl');
+      if (!grid) return;
+      var cards = list.map(makeCard);
+      grid.replaceChildren.apply(grid, cards);
+    });
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
+</script>
 </body>
 </html>

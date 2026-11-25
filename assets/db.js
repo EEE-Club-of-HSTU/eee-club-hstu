@@ -67,44 +67,144 @@ function demoDelay(label) {
   });
 }
 
-async function getEvents() {
+const ALLOWED_STATIC_PAGES = new Set(['constitution', 'history', 'privacy', 'terms']);
+const ALLOWED_SETTINGS = new Set(['footer', 'location']);
+const settingsCache = new Map();
+
+async function getPublishedDocs(collectionName, label) {
   if (!configured) return null;
   try {
     const { db, fs } = await getSdk();
     const q = fs.query(
-      fs.collection(db, 'event_logs'),
+      fs.collection(db, collectionName),
       fs.where('published', '==', true)
     );
     const snap = await fs.getDocs(q);
-    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    items.sort((a, b) => Date.parse(a.startsAt || '') - Date.parse(b.startsAt || ''));
-    return items;
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (err) {
-    console.warn('EEEDB.getEvents failed, using fallback:', err);
+    console.warn(`EEEDB.${label} failed, using fallback:`, err);
     return null;
   }
 }
 
+async function getEvents() {
+  const items = await getPublishedDocs('event_logs', 'getEvents');
+  if (!items) return null;
+  items.sort((a, b) => Date.parse(a.startsAt || '') - Date.parse(b.startsAt || ''));
+  return items;
+}
+
 async function getNotices() {
+  const items = await getPublishedDocs('notices', 'getNotices');
+  if (!items) return null;
+  items.sort((a, b) => {
+    const pinDiff = Number(Boolean(b.pinned)) - Number(Boolean(a.pinned));
+    if (pinDiff !== 0) return pinDiff;
+    return String(b.noticeDate || '').localeCompare(String(a.noticeDate || ''));
+  });
+  return items;
+}
+
+async function getBlogs() {
+  const items = await getPublishedDocs('blogs', 'getBlogs');
+  if (!items) return null;
+  items.sort((a, b) => String(b.publishedOn || '').localeCompare(String(a.publishedOn || '')));
+  return items;
+}
+
+async function getBlog(id) {
   if (!configured) return null;
+  const cleanId = String(id || '').trim();
+  if (!cleanId) return null;
   try {
     const { db, fs } = await getSdk();
-    const q = fs.query(
-      fs.collection(db, 'notices'),
-      fs.where('published', '==', true)
-    );
-    const snap = await fs.getDocs(q);
-    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    items.sort((a, b) => {
-      const pinDiff = Number(Boolean(b.pinned)) - Number(Boolean(a.pinned));
-      if (pinDiff !== 0) return pinDiff;
-      return String(b.noticeDate || '').localeCompare(String(a.noticeDate || ''));
-    });
-    return items;
+    const snap = await fs.getDoc(fs.doc(db, 'blogs', cleanId));
+    if (!snap.exists()) return null;
+    const data = snap.data();
+    return data && data.published === true ? { id: snap.id, ...data } : null;
   } catch (err) {
-    console.warn('EEEDB.getNotices failed, using fallback:', err);
+    console.warn('EEEDB.getBlog failed, using fallback:', err);
     return null;
   }
+}
+
+async function getMembers(category) {
+  const items = await getPublishedDocs('leadership_members', 'getMembers');
+  if (!items) return null;
+  items.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+  if (typeof category === 'string' && category.trim()) {
+    const cat = category.trim();
+    return items.filter((m) => m.category === cat);
+  }
+  return items;
+}
+
+async function getGallery() {
+  const items = await getPublishedDocs('gallery_items', 'getGallery');
+  if (!items) return null;
+  items.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+  return items;
+}
+
+async function getMagazines() {
+  const items = await getPublishedDocs('magazines', 'getMagazines');
+  if (!items) return null;
+  items.sort((a, b) => (Number(b.issueNumber) || 0) - (Number(a.issueNumber) || 0));
+  return items;
+}
+
+async function getResources() {
+  const items = await getPublishedDocs('resources', 'getResources');
+  if (!items) return null;
+  items.sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+  return items;
+}
+
+async function getFaqs() {
+  const items = await getPublishedDocs('faqs', 'getFaqs');
+  if (!items) return null;
+  items.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+  return items;
+}
+
+async function getPartners() {
+  const items = await getPublishedDocs('partners', 'getPartners');
+  if (!items) return null;
+  items.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+  return items;
+}
+
+async function getPage(id) {
+  if (!configured) return null;
+  const cleanId = String(id || '').trim();
+  if (!ALLOWED_STATIC_PAGES.has(cleanId)) return null;
+  try {
+    const { db, fs } = await getSdk();
+    const snap = await fs.getDoc(fs.doc(db, 'pages_static', cleanId));
+    return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+  } catch (err) {
+    console.warn(`EEEDB.getPage(${cleanId}) failed, using fallback:`, err);
+    return null;
+  }
+}
+
+async function getSettings(id) {
+  if (!configured) return null;
+  const cleanId = String(id || '').trim();
+  if (!ALLOWED_SETTINGS.has(cleanId)) return null;
+  if (settingsCache.has(cleanId)) return settingsCache.get(cleanId);
+  const promise = (async () => {
+    try {
+      const { db, fs } = await getSdk();
+      const snap = await fs.getDoc(fs.doc(db, 'site_settings', cleanId));
+      return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+    } catch (err) {
+      console.warn(`EEEDB.getSettings(${cleanId}) failed, using fallback:`, err);
+      return null;
+    }
+  })();
+  settingsCache.set(cleanId, promise);
+  return promise;
 }
 
 async function getCertificate(id) {
@@ -188,6 +288,16 @@ const api = {
   configured,
   getEvents,
   getNotices,
+  getBlogs,
+  getBlog,
+  getMembers,
+  getGallery,
+  getMagazines,
+  getResources,
+  getFaqs,
+  getPartners,
+  getPage,
+  getSettings,
   getCertificate,
   addAlumni,
   addContact,

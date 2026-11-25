@@ -7,10 +7,24 @@
 <meta name="description" content="The advisors of the EEE Club of HSTU, from the Department of Electrical & Electronic Engineering.">
 <meta name="theme-color" content="#08090B">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="canonical" href="https://eee-club-hstu.netlify.app/advisory.html">
+<meta property="og:site_name" content="EEE Club of HSTU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Advisory Panel — EEE Club of HSTU">
+<meta property="og:description" content="The advisors of the EEE Club of HSTU, from the Department of Electrical &amp; Electronic Engineering.">
+<meta property="og:url" content="https://eee-club-hstu.netlify.app/advisory.html">
+<meta property="og:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Advisory Panel — EEE Club of HSTU">
+<meta name="twitter:description" content="The advisors of the EEE Club of HSTU, from the Department of Electrical &amp; Electronic Engineering.">
+<meta name="twitter:image" content="https://eee-club-hstu.netlify.app/assets/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
+<script src="assets/safe-url.js"></script>
 </head>
 <body id="top" data-section="about">
 <div style="width: 100%; overflow-x: hidden">
@@ -25,7 +39,7 @@
 </section>
 
 <section class="wrap" style="padding-bottom: 120px">
-<article class="person" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 48px; align-items: center; padding: 32px; border-radius: 32px; background: #111317; border: 1px solid #262A31">
+<article id="advisory-featured" class="person" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 48px; align-items: center; padding: 32px; border-radius: 32px; background: #111317; border: 1px solid #262A31">
 <div style="overflow: hidden; border-radius: 20px; max-width: 460px"><img class="portrait" src="assets/advisory/19.jpg" alt="Prof. Dr. Md. Zamil Sultan" width="420" height="420"></div>
 <div>
 <div class="m" style="color: #D7FF3D">Chairman · President of the club</div>
@@ -45,7 +59,7 @@
 <div><div class="m" style="color: #D7FF3D">(01) — Advisors</div><div style="margin-top: 24px; font-size: clamp(48px, 6vw, 96px); line-height: 0.92; font-weight: 500; letter-spacing: -0.04em">The minds behind<br><span class="s">the circuit.</span></div></div>
 <p class="m" style="margin: 0; color: #8A8F98">Hover to bring them into colour</p>
 </div>
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 40px 20px; margin-top: 64px">
+<div id="advisory-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 40px 20px; margin-top: 64px">
 <article class="person"><div style="overflow: hidden; border-radius: 20px"><img class="portrait" src="assets/advisory/21.jpg" alt="Dr. Md. Faruk Kibria" loading="lazy"></div><h3 style="margin: 18px 0 0; font-size: 22px; font-weight: 500; letter-spacing: -0.01em">Dr. Md. Faruk Kibria</h3><div class="m" style="margin-top: 8px; color: #8A8F98">Professor</div></article>
 <article class="person"><div style="overflow: hidden; border-radius: 20px"><img class="portrait" src="assets/advisory/22.jpg" alt="Md. Mizanur Rahman" loading="lazy"></div><h3 style="margin: 18px 0 0; font-size: 22px; font-weight: 500; letter-spacing: -0.01em">Md. Mizanur Rahman</h3><div class="m" style="margin-top: 8px; color: #8A8F98">Associate Professor</div></article>
 <article class="person"><div style="overflow: hidden; border-radius: 20px"><img class="portrait" src="assets/advisory/20.jpg" alt="Md. Safiqul Islam" loading="lazy"></div><h3 style="margin: 18px 0 0; font-size: 22px; font-weight: 500; letter-spacing: -0.01em">Md. Safiqul Islam</h3><div class="m" style="margin-top: 8px; color: #8A8F98">Assistant Professor</div></article>
@@ -65,5 +79,95 @@
 </div>
 <script type="module" src="assets/db.js"></script>
 <script src="assets/site.js"></script>
+<script>
+(function () {
+
+  function makeInitials(name) {
+    var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return String(name || 'AD').trim().slice(0, 2).toUpperCase();
+  }
+
+  function makeMedia(m, maxW) {
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'overflow:hidden;border-radius:20px' + (maxW ? ';max-width:' + maxW : '');
+    var photo = window.EEESafeUrl(m.photoUrl);
+    if (photo) {
+      var img = document.createElement('img');
+      img.className = 'portrait';
+      img.src = photo;
+      img.alt = m.name || 'Advisor';
+      img.loading = 'lazy';
+      wrap.appendChild(img);
+    } else {
+      var av = document.createElement('div');
+      av.className = 'av';
+      av.textContent = makeInitials(m.name);
+      wrap.appendChild(av);
+    }
+    return wrap;
+  }
+
+  async function hydrate(db) {
+    if (!db || !db.configured) return;
+    var items = await db.getMembers('advisory');
+    if (!items || items.length === 0) return;
+
+    var lead = items[0];
+    var featEl = document.getElementById('advisory-featured');
+    if (featEl && lead) {
+      var right = document.createElement('div');
+      var role = document.createElement('div');
+      role.className = 'm';
+      role.style.color = '#D7FF3D';
+      role.textContent = lead.role || 'Advisor';
+
+      var h2 = document.createElement('h2');
+      h2.style.cssText = 'margin:16px 0 0;font-size:clamp(40px,5vw,72px);line-height:0.98;font-weight:500;letter-spacing:-0.035em';
+      h2.textContent = lead.name || '';
+
+      right.append(role, h2);
+      if (lead.subtitle) {
+        var sub = document.createElement('div');
+        sub.style.cssText = 'margin-top:14px;font-size:17px;color:#8A8F98';
+        sub.textContent = lead.subtitle;
+        right.appendChild(sub);
+      }
+      featEl.replaceChildren(makeMedia(lead, '460px'), right);
+    }
+
+    var rest = items.slice(1);
+    var grid = document.getElementById('advisory-grid');
+    if (grid) {
+      var cards = rest.map(function (m) {
+        var art = document.createElement('article');
+        art.className = 'person';
+
+        var h3 = document.createElement('h3');
+        h3.style.cssText = 'margin:18px 0 0;font-size:22px;font-weight:500;letter-spacing:-0.01em';
+        h3.textContent = m.name || '';
+
+        var role = document.createElement('div');
+        role.className = 'm';
+        role.style.cssText = 'margin-top:8px;color:#8A8F98';
+        role.textContent = m.role || '';
+
+        art.append(makeMedia(m), h3, role);
+        if (m.subtitle) {
+          var sub = document.createElement('div');
+          sub.style.cssText = 'margin-top:6px;font-size:14px;color:#8A8F98';
+          sub.textContent = m.subtitle;
+          art.appendChild(sub);
+        }
+        return art;
+      });
+      grid.replaceChildren.apply(grid, cards);
+    }
+  }
+
+  if (window.EEEDB) hydrate(window.EEEDB);
+  else window.addEventListener('eeedb:ready', function (e) { hydrate(e.detail || window.EEEDB); }, { once: true });
+})();
+</script>
 </body>
 </html>
