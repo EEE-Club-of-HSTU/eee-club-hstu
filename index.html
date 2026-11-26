@@ -105,7 +105,7 @@
 <p style="margin: 0; max-width: 400px; font-size: 18px; line-height: 1.55; color: #B9BDC4">The student engineering club of HSTU’s EEE department. We build robots, grids, chips and radios — and the people who make them.</p>
 </div>
 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-top: 48px; padding-top: 20px; border-top: 1px solid rgba(243,242,238,0.12)">
-<span style="display: flex; align-items: center; gap: 12px"><span class="blink" style="width: 8px; height: 8px; border-radius: 999px; background: #D7FF3D; box-shadow: 0 0 12px #D7FF3D"></span><span class="m" style="color: #8A8F98">Next up</span><span style="font-size: 15px">Embedded Bootcamp — 14 Nov</span></span>
+<span style="display: flex; align-items: center; gap: 12px"><span class="blink" style="width: 8px; height: 8px; border-radius: 999px; background: #D7FF3D; box-shadow: 0 0 12px #D7FF3D"></span><span class="m" style="color: #8A8F98">Next up</span><a id="next-up" href="events.html" style="font-size: 15px; color: #F3F2EE; text-decoration: none">Embedded Bootcamp — 14 Nov</a></span>
 <span class="m" style="color: #8A8F98">Move your cursor · scroll ↓</span>
 </div>
 </div>
@@ -335,10 +335,26 @@
     if (!all) return;
 
     var now = Date.now();
-    var next3 = all.filter(function (ev) {
+    var upcoming = all.filter(function (ev) {
       var ts = Date.parse(ev.startsAt || '');
       return !isNaN(ts) && ts >= now;
-    }).slice(0, 3);
+    });
+    var next3 = upcoming.slice(0, 3);
+
+    // Hero "Next up": same choice as the Events page countdown (next featured, else next upcoming).
+    var nextUp = document.getElementById('next-up');
+    if (nextUp) {
+      var hero = upcoming.find(function (ev) { return ev.featured === true; }) || upcoming[0];
+      if (hero) {
+        var d = new Date(hero.startsAt);
+        var when = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'Asia/Dhaka' }).format(d);
+        nextUp.textContent = (hero.title || 'Upcoming event') + ' — ' + when;
+        nextUp.href = window.EEESafeUrl(hero.link, 'events.html');
+      } else {
+        nextUp.textContent = 'Nothing scheduled — see past events';
+        nextUp.href = 'archive.html';
+      }
+    }
 
     var list = document.getElementById('home-upcoming-list');
     if (!list) return;
